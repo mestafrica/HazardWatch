@@ -1,0 +1,22 @@
+{
+  "name": "ghana-hazard-reporter",
+  "version": "1.0.0",
+  "description": "Create tools for tracking and reporting environmental hazards. There is currently no sure way to know current happenings around the country. This can be looked at as Twitter for reporting only hazards.",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "nodemon --env-file=.env index.js",
+    "start": "node index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.19.2",
+    "mongodb": "^6.8.0",
+    "mongoose": "^8.5.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.4"
+  }
+}
