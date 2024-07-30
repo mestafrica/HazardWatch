@@ -1,18 +1,8 @@
-import mongoose, {Schema} from "mongoose";
-import IUser from "../interfaces/hazardtypes";
+import mongoose, { Schema } from 'mongoose';
+import IHazardType from '../interfaces/hazardtypes';
 
-const UserSchema: Schema = new Schema({
-    hazardType:{ type: String, enum: ['Air Quality', 'Water Contamination', 'Noise Levels'] },
-    description:{type: String, required:true},
-    images:{type: String, required:true},
-    latitude:{type: String, required:true},
-    longitude:{type: String, required:true},
-    city:{type: String, required:true},
-    country:{type: String, required:true},
+const hazardTypeSchema: Schema = new Schema({
+    name: { type: String, unique: true, required: true }
+});
 
-},
-{
-    timestamps:true
-})
-
-export default mongoose.model<IUser>('User', UserSchema)
+export default mongoose.model<IHazardType>('HazardType', hazardTypeSchema);

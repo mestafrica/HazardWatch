@@ -4,6 +4,7 @@ import bodyParser from 'body-parser';
 import mongoose from 'mongoose'
 import logging from './config/logging'
 import userRoutes from './router/user'
+import hazardRoutes from './router/hazardtypes'
 import dotenv from 'dotenv';
 import config from './config/config'
 
@@ -62,6 +63,8 @@ router.use((req, res, next) => {
 
 // Use Route
 router.use('/users',userRoutes)
+router.use('/hazard',hazardRoutes)
+
 
 // Error handling
 router.use((req, res, next) =>{
@@ -72,32 +75,3 @@ const httpServer = http.createServer(router);
 
 httpServer.listen(config.server.port, () => logging.info(NAMESPACE, `Server is running ${config.server.hostname}:${config.server.port}`));
 
-// // create express app
-// const app = express();
-
-// // apply middlewares
-// app.use(cors({
-//    credentials:true,
-// }));
-
-// app.use(compression());
-// app.use(cookieParser());
-// app.use(bodyParser.json());
-
-// // create server
-// const server = http.createServer(app);
-
-
-// // listen for incoming requests
-// server.listen(8080, () =>{
-//    console.log('Server is running on http://localhost:8080/');
-// });
-
-// mongoose.Promise = Promise;
-// mongoose.connect(process.env.MONGO_URL)
-// .then(() => console.log('Database is connected'))
-// .catch((error: Error) => console.log('Database connection error:', error));
-
-
-// mongoose.connection.on('error', (error: Error) => console.log(error));
-// app.use('/', router());

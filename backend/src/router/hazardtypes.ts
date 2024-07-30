@@ -1,15 +1,12 @@
 import express from 'express';
-import controller from '../controllers/user';
-
-
+import controller from '../controllers/hazardtypes';
 
 const router = express.Router();
 
-// Define routes
-router.get('/validate', controller.validateToken);
-router.post('/register', controller.register);
-router.post('/login', controller.login);
-router.get('/get/all', controller.getAllUsers);
+router.post('/create', controller.createHazardType);
+router.get('/all', controller.getAllHazardTypes);
+router.get('/:id', controller.getHazardTypeById);
+router.patch('/update/:id', controller.updateHazardType);
+router.delete('/delete/:id', controller.deleteHazardType);
 
-// Export router
 export = router;

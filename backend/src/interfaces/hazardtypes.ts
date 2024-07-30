@@ -1,6 +1,5 @@
 import { Document } from 'mongoose';
 
-export default interface IUser extends Document{
-    username:string;
-    password: string;
+export default interface IHazardType extends Document{
+    name:string;
 }
