@@ -4,127 +4,117 @@ import HazardType from '../models/hazardtypes';
 
 const NAMESPACE = 'HazardType';
 
-const createHazardType = (req: Request, res: Response, next: NextFunction) => {
+const createHazardType = async (req: Request, res: Response, next: NextFunction) => {
     const { name } = req.body;
 
     const _hazardType = new HazardType({
         _id: new mongoose.Types.ObjectId(),
         name
     });
-
-    return _hazardType
-        .save()
-        .then((hazardType) => {
-            return res.status(201).json({
-                hazardType
-            });
-        })
-        .catch((error) => {
-            return res.status(500).json({
-                message: error.message,
-                error
-            });
+    try {
+        const hazardType = await _hazardType.save();
+        return res.status(400).json({
+            message: 'Hazard Type created successfully',     hazardType
         });
+    } catch (error) {
+        next(error); 
+    }
 };
 
-const getAllHazardTypes = (req: Request, res: Response, next: NextFunction) => {
-    HazardType.find()
-        .exec()
-        .then((hazardTypes) => {
+
+
+const getAllHazardTypes = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const hazardTypes = await HazardType.find().exec();
+
+        return res.status(200).json({
+            message: 'All the Hazard Types',  hazardTypes,
+            count: hazardTypes.length
+        });
+    } catch (error) {
+        // return res.status(500).json({
+        //     message: error.message,
+        //     error
+        // });
+        next(error); 
+    }
+};
+
+
+const getHazardTypeById = async (req: Request, res: Response, next: NextFunction) => {
+    const hazardTypeId = req.params.id;
+
+    try {
+        const hazardType = await HazardType.findById(hazardTypeId).exec();
+
+        if (hazardType) {
             return res.status(200).json({
-                hazardTypes: hazardTypes,
-                count: hazardTypes.length
+              message: 'Your Specific Hazard Type',hazardType
             });
-        })
-        .catch((error) => {
-            return res.status(500).json({
-                message: error.message,
-                error
+        } else {
+            return res.status(404).json({
+                message: 'Hazard Type not found'
             });
-        });
+        }
+    } catch (error) {
+        // return res.status(500).json({
+        //     message: error.message,
+        //     error
+        // });
+    }
 };
 
-const getHazardTypeById = (req: Request, res: Response, next: NextFunction) => {
+const updateHazardType = async (req: Request, res: Response, next: NextFunction) => {
     const hazardTypeId = req.params.id;
 
-    HazardType.findById(hazardTypeId)
-        .exec()
-        .then((hazardType) => {
-            if (hazardType) {
-                return res.status(200).json({
-                    hazardType
-                });
-            } else {
-                return res.status(404).json({
-                    message: 'HazardType not found'
-                });
-            }
-        })
-        .catch((error) => {
-            return res.status(500).json({
-                message: error.message,
-                error
+    try {
+        const hazardType = await HazardType.findById(hazardTypeId).exec();
+
+        if (hazardType) {
+            hazardType.set(req.body);
+
+            const result = await hazardType.save();
+
+            return res.status(200).json({
+                message: 'Your Specific Hazard Type',                hazardType: result
             });
-        });
+        } else {
+            return res.status(404).json({
+                message: 'HazardType not found'
+            });
+        }
+    } catch (error) {
+        // return res.status(500).json({
+        //     message: error.message,
+        //     error
+        // });
+        next(error)
+    }
 };
 
-const updateHazardType = (req: Request, res: Response, next: NextFunction) => {
+
+const deleteHazardType = async (req: Request, res: Response, next: NextFunction) => {
     const hazardTypeId = req.params.id;
 
-    HazardType.findById(hazardTypeId)
-        .exec()
-        .then((hazardType) => {
-            if (hazardType) {
-                hazardType.set(req.body);
+    try {
+        const hazardType = await HazardType.findByIdAndDelete(hazardTypeId).exec();
 
-                hazardType.save()
-                    .then((result) => {
-                        return res.status(200).json({
-                            hazardType: result
-                        });
-                    })
-                    .catch((error) => {
-                        return res.status(500).json({
-                            message: error.message,
-                            error
-                        });
-                    });
-            } else {
-                return res.status(404).json({
-                    message: 'HazardType not found'
-                });
-            }
-        })
-        .catch((error) => {
-            return res.status(500).json({
-                message: error.message,
-                error
+        if (hazardType) {
+            return res.status(200).json({
+                message: 'Hazard Type Deleted'
             });
-        });
-};
-
-const deleteHazardType = (req: Request, res: Response, next: NextFunction) => {
-    const hazardTypeId = req.params.id;
-
-    HazardType.findByIdAndDelete(hazardTypeId)
-        .exec()
-        .then((hazardType) => {
-            if (hazardType) {
-                return res.status(200).json({
-                    message: 'Hazard Type Deleted'
-                });
-            } else {
-                return res.status(404).json({
-                    message: 'Hazard Type not found'
-                });
-            }
-        })
-        .catch((error) => {
-            return res.status(500).json({
-                message: error.message,
-                error
+        } else {
+            return res.status(404).json({
+                message: 'Hazard Type not found'
             });
-        });
+        }
+    } catch (error) {
+        // return res.status(500).json({
+        //     message: error.message,
+        //     error
+        // });
+        next(error)
+    }
 };
 
 export default { createHazardType, getAllHazardTypes, getHazardTypeById, updateHazardType, deleteHazardType };
