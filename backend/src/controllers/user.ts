@@ -104,7 +104,7 @@ const login = (req: Request, res: Response, next: NextFunction) => {
 
 // Function to edit user
 const editUser = async (req: Request, res: Response, next: NextFunction) => {
-    const  userId  = req.params.id;
+    const userId = req.params.id;
     const updateData = req.body;
 
     try {
@@ -132,7 +132,7 @@ const editUser = async (req: Request, res: Response, next: NextFunction) => {
 
 // Function to delete a user
 const deleteUser = async (req: Request, res: Response, next: NextFunction) => {
-    const  userId  = req.params.id;
+    const userId = req.params.id;
 
     try {
         const user = await User.findByIdAndDelete(userId).exec();
@@ -168,7 +168,7 @@ const logout = async (req: Request, res: Response, next: NextFunction) => {
         return res.status(500).json({
             message: 'Error processing request',
             error: error instanceof Error ? error.message : String(error)
-            });
+        });
     }
 };
 

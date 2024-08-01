@@ -6,6 +6,7 @@ import logging from './config/logging'
 import userRoutes from './router/user'
 import dotenv from 'dotenv';
 import config from './config/config'
+import recoveryRouter from './router/recovery_router'
 
 
 
@@ -60,6 +61,7 @@ router.use((req, res, next) => {
 
 // Use Route
 router.use('/api', userRoutes)
+router.use('/api', recoveryRouter)
 
 // Error handling for not found routes
 router.use((req, res, next) =>{
@@ -79,3 +81,6 @@ const httpServer = http.createServer(router);
 
 httpServer.listen(config.server.port, () => logging.info(NAMESPACE, `Server is running on ${config.server.hostname}:${config.server.port}`));
 
+export const BASE_URL="http:localhost:3600"
+export const FORGOT_PASSWORD_API_URL =`${BASE_URL}/src/auth/forgot-password`
+export const RESET_PASSWORK_API_URL=`{BASE_URL}/src/auth/reset-password`
