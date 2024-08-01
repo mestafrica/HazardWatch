@@ -1,10 +1,12 @@
 import { NextFunction, Request, Response } from 'express';
 import mongoose from 'mongoose';
 import HazardType from '../models/hazardtypes';
+import { hazardtypeSchema } from 'schema/hazardtypes';
 
 const NAMESPACE = 'HazardType';
 
 const createHazardType = async (req: Request, res: Response, next: NextFunction) => {
+
     const { name } = req.body;
 
     const _hazardType = new HazardType({
@@ -12,6 +14,16 @@ const createHazardType = async (req: Request, res: Response, next: NextFunction)
         name
     });
     try {
+     // Validate the data provided to create a hazardtype
+     const { error, value } = hazardtypeSchema.validate(req.body);
+     if (error) {
+         console.error('Validation Error:', error.details[0].message);
+         return res.status(400).send(error.details[0].message);
+     }
+
+     const name = value.name;
+     console.log('Validation successful. Checking if a hazard type is created:', name);
+
         const hazardType = await _hazardType.save();
         return res.status(400).json({
             message: 'Hazard Type created successfully',     hazardType
@@ -25,6 +37,15 @@ const createHazardType = async (req: Request, res: Response, next: NextFunction)
 
 const getAllHazardTypes = async (req: Request, res: Response, next: NextFunction) => {
     try {
+         // Validate the data provided to get all hazardtypes
+     const { error, value } = hazardtypeSchema.validate(req.body);
+     if (error) {
+         console.error('Validation Error:', error.details[0].message);
+         return res.status(400).send(error.details[0].message);
+     }
+
+     const name = value.name;
+     console.log('Validation successful. Checking to get all hazard types:', name);
         const hazardTypes = await HazardType.find().exec();
 
         return res.status(200).json({
@@ -32,11 +53,7 @@ const getAllHazardTypes = async (req: Request, res: Response, next: NextFunction
             count: hazardTypes.length
         });
     } catch (error) {
-        // return res.status(500).json({
-        //     message: error.message,
-        //     error
-        // });
-        next(error); 
+           next(error); 
     }
 };
 
@@ -45,6 +62,15 @@ const getHazardTypeById = async (req: Request, res: Response, next: NextFunction
     const hazardTypeId = req.params.id;
 
     try {
+         // Validate the data provided for one hazardtype
+     const { error, value } = hazardtypeSchema.validate(req.body);
+     if (error) {
+         console.error('Validation Error:', error.details[0].message);
+         return res.status(400).send(error.details[0].message);
+     }
+
+     const name = value.name;
+     console.log('Validation successful. Checking to get one hazard type:', name);
         const hazardType = await HazardType.findById(hazardTypeId).exec();
 
         if (hazardType) {
@@ -57,10 +83,7 @@ const getHazardTypeById = async (req: Request, res: Response, next: NextFunction
             });
         }
     } catch (error) {
-        // return res.status(500).json({
-        //     message: error.message,
-        //     error
-        // });
+        next(error)
     }
 };
 
@@ -68,6 +91,15 @@ const updateHazardType = async (req: Request, res: Response, next: NextFunction)
     const hazardTypeId = req.params.id;
 
     try {
+         // Validate the data to update a hazardtype
+     const { error, value } = hazardtypeSchema.validate(req.body);
+     if (error) {
+         console.error('Validation Error:', error.details[0].message);
+         return res.status(400).send(error.details[0].message);
+     }
+
+     const name = value.name;
+     console.log('Validation successful. Checking to update a hazard type:', name);
         const hazardType = await HazardType.findById(hazardTypeId).exec();
 
         if (hazardType) {
@@ -84,10 +116,6 @@ const updateHazardType = async (req: Request, res: Response, next: NextFunction)
             });
         }
     } catch (error) {
-        // return res.status(500).json({
-        //     message: error.message,
-        //     error
-        // });
         next(error)
     }
 };
@@ -97,6 +125,15 @@ const deleteHazardType = async (req: Request, res: Response, next: NextFunction)
     const hazardTypeId = req.params.id;
 
     try {
+         // Validate the data to delete a hazardtype
+     const { error, value } = hazardtypeSchema.validate(req.params.id);
+     if (error) {
+         console.error('Validation Error:', error.details[0].message);
+         return res.status(400).send(error.details[0].message);
+     }
+
+     const name = value.name;
+     console.log('Validation successful. Checking to delete a hazard type:', name);
         const hazardType = await HazardType.findByIdAndDelete(hazardTypeId).exec();
 
         if (hazardType) {
@@ -109,11 +146,7 @@ const deleteHazardType = async (req: Request, res: Response, next: NextFunction)
             });
         }
     } catch (error) {
-        // return res.status(500).json({
-        //     message: error.message,
-        //     error
-        // });
-        next(error)
+         next(error)
     }
 };
 
