@@ -5,18 +5,7 @@ export default {
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
-    extend: {
-     colors:{
-      fontColor:"#0E21CF" ,
-      fieldColor: " #ECECEC",
-      btnBgColor: " #E6FCF9"
-
-
-
-
-     }
-
-    },
+    extend: { },
   },
   plugins: [],
 }

@@ -22,7 +22,7 @@ const SignUp: React.FC = () => {
     <div className="flex items-center justify-between mx-48">
       <div className="w-1/2 mx-10 h-screen">
         <div className="mb-5">
-          <h4 className="text-fontColor font-bold text-[35px]">
+          <h4 className="text-#0E21CF font-bold text-[35px]">
             Sign Up to <br /> Ghana Hazard Reporter
           </h4>
           <p className="font-light text-[15px] leading-[23px]">
@@ -43,7 +43,7 @@ const SignUp: React.FC = () => {
               <input
                 id="fullName"
                 type="text"
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none bg-fieldColor focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none bg-#ECECEC focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                 placeholder="Enter full name"
                 required
               />
@@ -58,7 +58,7 @@ const SignUp: React.FC = () => {
               <input
                 id="email"
                 type="email"
-                className="mt-1 block w-full px-3 py-2 border bg-fieldColor border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                className="mt-1 block w-full px-3 py-2 border bg-#ECECEC border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                 placeholder="Enter your email address"
                 required
               />
@@ -74,7 +74,7 @@ const SignUp: React.FC = () => {
               <input
                 id="password"
                 type={passwordVisible ? "text" : "password"}
-                className="mt-1 block w-full px-3 py-2 border bg-fieldColor border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                className="mt-1 block w-full px-3 py-2 border bg-#ECECEC border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                 placeholder="Enter password"
                 required
               />
@@ -97,7 +97,7 @@ const SignUp: React.FC = () => {
               <input
                 id="confirmPassword"
                 type={confirmPasswordVisible ? "text" : "password"}
-                className="mt-1 block w-full px-3 py-2 border bg-fieldColor border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                className="mt-1 block w-full px-3 py-2 border bg-#ECECEC border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                 placeholder="Confirm password"
                 required
               />
@@ -112,7 +112,7 @@ const SignUp: React.FC = () => {
 
             <button
               type="submit"
-              className="w-full py-2 mb-10 px-4 border border-transparent rounded-md shadow-sm text-base font-medium bg-btnBgColor focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              className="w-full py-2 mb-10 px-4 border border-transparent rounded-md shadow-sm text-base font-medium bg- #E6FCF9 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
             >
               Sign up
             </button>
