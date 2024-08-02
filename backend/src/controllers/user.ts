@@ -62,43 +62,42 @@ const register = async (req: Request, res: Response, next: NextFunction) => {
 
 
 // Function to login (token)
-const login = (req: Request, res: Response, next: NextFunction) => {
+const login = async (req: Request, res: Response, next: NextFunction) => {
     const { userName, password } = req.body;
-
-    User.find({ userName })
-        .exec()
-        .then((users) => {
-            if (users.length !== 1) {
-                return res.status(401).json({
-                    message: 'Unauthorized'
-                });
-            }
-
-            bcryptjs.compare(password, users[0].password, (error, result) => {
-                if (error || !result) {
+    try {
+        const user = await User.findOne({ userName })
+            .exec();
+                if (!user) {
                     return res.status(401).json({
-                        message: 'Password Mismatch'
+                        message: 'Unauthorized'
                     });
                 }
-                signJWT(users[0], (_error, token) => {
-                    if (_error) {
-                        return res.status(500).json({
-                            message: isErrorWithMessage(_error) ? _error.message : 'Unknown error occurred',
-                            error: _error
+    
+                const isMatch = bcryptjs.compare(password, user.password)
+                    if (!isMatch) {
+                        return res.status(401).json({
+                            message: 'Password Mismatch'
                         });
-                    } else if (token) {
-                        return res.status(200).json({ token });
                     }
-                });
-            });
-        })
-        .catch((err) => {
+                    // Sign JWT using the signJWT function
+                    signJWT(user, (signError, token) => {
+                        if (signError) {
+                            return res.status(500).json({
+                                message: isErrorWithMessage(signError) ? signError.message : 'Unknown error occurred',
+                                error: signError
+                            });
+                        } else if (token) {
+                            return res.status(200).json({ token });
+                        }
+                    });
+    } catch(err) {
             logging.error(NAMESPACE, 'Error finding user', err);
             return res.status(500).json({
                 message: isErrorWithMessage(err) ? err.message : 'Unknown error occurred',
                 error: err
+        
             });
-        });
+        };
 };
 
 
@@ -192,5 +191,9 @@ const getAllUsers = (req: Request, res: Response, next: NextFunction) => {
             });
         });
 };
+
+
+// Function for an admin to create a user
+
 
 export default { register, login, logout, editUser, deleteUser, getAllUsers };
