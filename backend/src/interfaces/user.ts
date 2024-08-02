@@ -1,6 +1,10 @@
-import { Document } from 'mongoose';
+import { Document, Types } from 'mongoose';
 
 export default interface IUser extends Document{
-    username:string;
+    firstName: string;
+    lastName: string;
+    userName: string;
     password: string;
+    confirmPassword: string;
+    reports: Types.ObjectId[];
 }

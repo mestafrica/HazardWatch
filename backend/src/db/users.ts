@@ -3,7 +3,7 @@ import mongoose from 'mongoose'
 // Define schema
 
 const UserSchema = new mongoose.Schema({
-    username:{type:String, required:true},
+    userName:{type:String, required:true},
     email:{type:String, required:true},
     authentication:{
         password:{type:String, required: true, select:false},
