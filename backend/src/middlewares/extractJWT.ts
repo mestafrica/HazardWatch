@@ -30,4 +30,16 @@ const extractJWT = (req: Request, res: Response, next: NextFunction) => {
     }
 };
 
-export default extractJWT;
+const checkAdmin = (req: Request, res: Response, next: NextFunction) => {
+    const decoded = res.locals.jwt;
+    
+    if (decoded && decoded.role === 'admin') {
+        next();
+    } else {
+        return res.status(403).json({
+            message: 'Access denied: Admins only'
+        });
+    }
+};
+
+export { extractJWT, checkAdmin };

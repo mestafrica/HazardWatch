@@ -1,6 +1,6 @@
 import express from 'express';
 import controller from '../controllers/user';
-import extractJWT from '../middlewares/extractJWT';
+import { extractJWT, checkAdmin } from 'middlewares/extractJWT';
 
 const router = express.Router();
 
