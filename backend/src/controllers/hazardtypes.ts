@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import mongoose from 'mongoose';
 import HazardType from '../models/hazardtypes';
-import { hazardtypeSchema } from 'schema/hazardtypes';
+import { hazardtypeSchema } from '../schema/hazardtypes';
 
 const NAMESPACE = 'HazardType';
 

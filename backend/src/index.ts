@@ -77,9 +77,7 @@ const httpServer = http.createServer(router);
 
 httpServer.listen(config.server.port, () => logging.info(NAMESPACE, `Server is running ${config.server.hostname}:${config.server.port}`));
 
-   return res.status(404).json({message: error.message});
-});
-
+   
 // Error handling middleware
 router.use((error: Error, req: Request, res: Response, next: NextFunction) => {
   logging.error(NAMESPACE, error.message, error);
