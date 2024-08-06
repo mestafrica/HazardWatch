@@ -3,9 +3,14 @@
         "module": "NodeNext",
         "moduleResolution": "NodeNext",
         "baseUrl": "src",
-        "outDir": "dist",
+        "outDir": "./dist",
         "sourceMap": true,
-        "noImplicitAny": true
+        "noImplicitAny": true,
+        "target": "ES6",
+        "rootDir": "./src",
+        "strict": true,
+        "esModuleInterop": true
     },
-    "include": ["src/**/*"]
+    "include": ["src/**/*.ts",],
+    "exclude": ["node_modules"]
 }
