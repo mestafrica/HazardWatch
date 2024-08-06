@@ -6,49 +6,41 @@ import IUser from '../interfaces/user';
 const NAMESPACE = 'Auth';
 
 const signJWT = (user: IUser, callback: (error: Error | null, token: string | null) => void): void => {
-    const timeSinchEpoch = new Date().getTime();
-    const expirationTime = timeSinchEpoch + Number(config.server.token.expireTime) * 100000;
-    const expirationTimeInSeconds = Math.floor(expirationTime / 1000);
+    // const timeSinchEpoch = new Date().getTime();
+    // const expirationTime = timeSinchEpoch + Number(config.server.token.expireTime) * 100000;
+    // const expirationTimeInSeconds = Math.floor(expirationTime / 1000);
 
-    logging.info(NAMESPACE, `Attempting to sign for token for ${user.userName}`);
+    logging.info('Auth', `Attempting to sign for token for ${user.userName}`);
+
+    const payload = {
+        id: user._id.toString(),   // Ensure user ID is in the payload
+        userName: user.userName,
+        role: user.role
+    };
     try {
         jwt.sign(
-            {
-                userName: user.userName
-            },
+            payload,
             config.server.token.secret,
             {
                 issuer: config.server.token.issuer,
                 algorithm: 'HS256',
-                expiresIn: expirationTimeInSeconds
+                expiresIn: config.server.token.expireTime
             },
             (error, token) => {
                 if (error) {
-                    if (error instanceof Error) {
-                        callback(error, null)
-                    } else {
-                        logging.error(NAMESPACE, 'An unknown error occurred', error);
-                        callback(new Error('An unknown error occurred'), null);
-                    }
-
-                } else if (token) {
-                    callback(null, token);
+                    logging.error(NAMESPACE, 'JWT signing error', error);
+                    callback(error, null)
                 } else {
-                    logging.error(NAMESPACE, 'Token generation failed');
-                    callback(new Error('Token generation failed'), null);
-                }
+                    // Ensure token is either string or null
+                    callback(null, token ?? null);
+                }      
             }
-        );
-    } catch (error) {
-        if (error instanceof Error) {
-            logging.error(NAMESPACE, error.message, error);
-            callback(error, null);
-        } else {
-            logging.error(NAMESPACE, 'An unknown error occurred', error);
-            callback(new Error('An unknown error occurred'), null);
-        }
-
-    }
+    );
+} catch (error) {
+    // if (error instanceof Error) {
+        logging.error(NAMESPACE, 'An error occurred while signing the JWT', error);
+        callback(error as Error, null);
+    } 
 };
 
 export default signJWT;
