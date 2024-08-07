@@ -7,6 +7,10 @@ import userRoutes from './router/user'
 import hazardRoutes from './router/hazardtypes'
 import dotenv from 'dotenv';
 import config from './config/config'
+import cors from "cors";
+import "express-async-errors";
+import { resetPassRouter } from 'router/resetpassword.';
+
 
 
 
@@ -37,6 +41,10 @@ router.use((req, res, next) => {
    next();
 });
 
+
+//security middleware
+router.use(cors());
+
 //Parse the body of the request 
 router.use(bodyParser.urlencoded({ extended: true }));
 router.use(bodyParser.json());
@@ -63,8 +71,8 @@ router.use((req, res, next) => {
 
 router.use('/users',userRoutes)
 router.use('/hazard',hazardRoutes)
-
 router.use('/api', userRoutes)
+router.use('/api', resetPassRouter);
 
 
 // Error handling for not found routes
@@ -77,8 +85,9 @@ const httpServer = http.createServer(router);
 
 httpServer.listen(config.server.port, () => logging.info(NAMESPACE, `Server is running ${config.server.hostname}:${config.server.port}`));
 
-   return res.status(404).json({message: error.message});
-});
+  //  return res.status(404).json({message: error.message});
+  console.log("error");
+
 
 // Error handling middleware
 router.use((error: Error, req: Request, res: Response, next: NextFunction) => {
@@ -87,6 +96,7 @@ router.use((error: Error, req: Request, res: Response, next: NextFunction) => {
     message: error.message
   });
 });
+
 
 
 
