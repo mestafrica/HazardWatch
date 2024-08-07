@@ -6,6 +6,7 @@ import User from '../models/user';
 import jwt from 'jsonwebtoken';
 import config from '../config/config';
 import signJWT from '../functions/signJWT'
+import { createUserValidator, forgotPasswordValidator, loginValidator, registerValidator, updateUserValidator } from 'schema/user';
 
 const NAMESPACE = 'User';
 
@@ -22,6 +23,11 @@ const isErrorWithMessage = (error: unknown): error is { message: string } => {
 
 // Function to register a user
 const register = async (req: Request, res: Response, next: NextFunction) => {
+       // Validate request
+       const { value, error } = registerValidator.validate(req.body);
+       if (error) {
+           return res.status(422).json(error);
+       }
     const { firstName, lastName, email, userName, password, confirmPassword } = req.body;
     // Check for all required fields
     if (!firstName || !lastName || !email || !userName || !password || !confirmPassword) {
@@ -33,7 +39,7 @@ const register = async (req: Request, res: Response, next: NextFunction) => {
     }
     try {
         // Hash the password
-        const hash = await bcryptjs.hash(password, 10);
+        const hash = await bcryptjs.hashSync(password, 10);
 
         // Create new user
         const _user = new User({
@@ -65,6 +71,11 @@ const register = async (req: Request, res: Response, next: NextFunction) => {
 const login = async (req: Request, res: Response, next: NextFunction) => {
     const { userName, password } = req.body;
     try {
+          // Validate request
+          const { value, error } = loginValidator.validate(req.body);
+          if (error) {
+              return res.status(422).json(error);
+          }
         const user = await User.findOne({ userName })
             .exec();
                 if (!user) {
@@ -100,15 +111,47 @@ const login = async (req: Request, res: Response, next: NextFunction) => {
         };
 };
 
+export const createUser = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        // Validate request
+        const { value, error } = createUserValidator.validate(req.body);
+        if (error) {
+            return res.status(422).json(error);
+        }
+        // Encrypt user password
+        const hashedPassword = bcryptjs.hashSync(value.password, 10);
+        // Create user
+        await User.create({
+            ...value,
+            password: hashedPassword
+        });
+        // Send email to user
+        // await mailTransport.sendMail({
+        //     to: value.email,
+        //     subject: "User Account Created!",
+        //     text: `Dear user,\n\nA user account has been created for you with the following credentials.\n\nUsername: ${value.username}\nEmail: ${value.email}\nPassword: ${value.password}\nRole: ${value.role}\n\nThank you!`,
+        // });
+        // Return response
+        res.status(201).json('User Created');
+    } catch (error) {
+        next(error);
+    }
+}
 
 // Function to edit user
 const editUser = async (req: Request, res: Response, next: NextFunction) => {
-    const  userId  = req.params.id;
-    const updateData = req.body;
 
     try {
-        const user = await User.findByIdAndUpdate(userId, updateData, { new: true }).exec();
-
+            // Validate request
+            const { value, error } = updateUserValidator.validate(req.body);
+            if (error) {
+                return res.status(422).json(error);
+            }
+        const user = await User.findByIdAndUpdate(
+            req.params.id,
+            value,
+            { new: true }
+        );
         if (!user) {
             return res.status(404).json({
                 message: 'User not found'
@@ -193,7 +236,9 @@ const getAllUsers = (req: Request, res: Response, next: NextFunction) => {
 };
 
 
+
+
 // Function for an admin to create a user
 
 
-export default { register, login, logout, editUser, deleteUser, getAllUsers };
+export default { register, login, createUser, logout, editUser, deleteUser, getAllUsers };

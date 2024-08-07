@@ -151,3 +151,4 @@ const deleteHazardType = async (req: Request, res: Response, next: NextFunction)
 };
 
 export default { createHazardType, getAllHazardTypes, getHazardTypeById, updateHazardType, deleteHazardType };
+

@@ -45,10 +45,6 @@ const hasPermission = (permission: string) => {
             const decodedJwt = res.locals.jwt as jwt.JwtPayload;
             const userId = decodedJwt.id;
             // // Log the JWT payload
-            // console.log('JWT payload in hasPermission:', res.locals.jwt);
-            // // Get user id from request
-            // const id = res.locals.jwt?.id;
-            // console.log('User ID from JWT:', id);
             if (!userId) {
                 return res.status(401).json('Unauthorized: No user ID provided.');
             }
@@ -73,4 +69,4 @@ const hasPermission = (permission: string) => {
     }
 }
 
-export default { checkAuth, hasPermission }
+export { checkAuth, hasPermission }
