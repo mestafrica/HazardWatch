@@ -20,7 +20,7 @@ const UserSchema: Schema = new Schema({
         timestamps: true
     })
 
-
+//create an instance method
 UserSchema.pre("save", async function (next) {
     if (!this.isModified("password")) {
         return next();

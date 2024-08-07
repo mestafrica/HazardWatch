@@ -9,7 +9,9 @@ import dotenv from 'dotenv';
 import config from './config/config'
 import cors from "cors";
 import "express-async-errors";
-import { resetPassRouter } from 'router/resetpassword.';
+import { resetPasswordRequestController } from 'controllers/auth.controller';
+import { resetPasswordController } from 'controllers/auth.controller';
+
 
 
 
@@ -69,10 +71,12 @@ router.use((req, res, next) => {
 
 // Use Route
 
-router.use('/users',userRoutes)
-router.use('/hazard',hazardRoutes)
-router.use('/api', userRoutes)
-router.use('/api', resetPassRouter);
+router.use('/users',userRoutes);
+router.use('/hazard',hazardRoutes);
+router.use('/api', userRoutes);
+router.use('api', resetPasswordController);
+router.use('api', resetPasswordRequestController);
+
 
 
 // Error handling for not found routes
@@ -85,10 +89,7 @@ const httpServer = http.createServer(router);
 
 httpServer.listen(config.server.port, () => logging.info(NAMESPACE, `Server is running ${config.server.hostname}:${config.server.port}`));
 
-  //  return res.status(404).json({message: error.message});
-  console.log("error");
-
-
+   
 // Error handling middleware
 router.use((error: Error, req: Request, res: Response, next: NextFunction) => {
   logging.error(NAMESPACE, error.message, error);

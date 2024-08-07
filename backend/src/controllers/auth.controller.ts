@@ -1,15 +1,5 @@
-import { signup, requestPasswordReset, resetPassword } from "../services/auth.service"
+import { requestPasswordReset, resetPassword } from "../services/auth.service"
 
-
-
-// export const signUpController = async (req:any, res:any, next:any) => {
-//     try {
-//         const signupService = await signup(req.body);
-//         return res.json(signupService);
-//     } catch (error) {
-//         next(error);
-//     }
-// };
 
 
 export const resetPasswordRequestController = async (req:any, res:any, next:any) => {
@@ -29,9 +19,9 @@ export const resetPasswordRequestController = async (req:any, res:any, next:any)
 export const resetPasswordController = async (req:any, res:any, next:any) => {
 try {
         const resetPasswordService = await resetPassword(
-            req.body.userId,
+            // req.body.userId,
             req.body.token,
-            req.body.password
+            // req.body.password
         );
         return res.json(resetPasswordService);
 } catch (error) {

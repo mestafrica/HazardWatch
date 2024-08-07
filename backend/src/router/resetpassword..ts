@@ -3,10 +3,10 @@ import { Router } from "express";
 
 
 
-export const resetPassRouter = Router();
+export const forgotpasswordRouter = Router();
 
 
-resetPassRouter.post('users/resetpassword', resetPasswordRequestController);
+forgotpasswordRouter.post('users/forgotpassword', resetPasswordRequestController);
 
-resetPassRouter.post('users/resetpassword', resetPasswordController);
+forgotpasswordRouter.patch('users/resetpassword/:token', resetPasswordController);
 

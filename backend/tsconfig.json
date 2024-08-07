@@ -3,7 +3,7 @@
         "module": "NodeNext",
         "moduleResolution": "NodeNext",
         "baseUrl": "src",
-        "outDir": "./dist",
+        "outDir": "dist",
         "sourceMap": true,
         "noImplicitAny": true,
         "target": "ES6",
