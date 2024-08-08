@@ -6,7 +6,7 @@ import User from '../models/user';
 import jwt from 'jsonwebtoken';
 import config from '../config/config';
 import signJWT from '../functions/signJWT'
-import { createUserValidator, forgotPasswordValidator, loginValidator, registerValidator, updateUserValidator } from 'schema/user';
+import { createUserValidator, forgotPasswordValidator, loginValidator, registerValidator, updateUserValidator } from '../schema/user';
 
 const NAMESPACE = 'User';
 
