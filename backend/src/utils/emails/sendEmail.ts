@@ -8,15 +8,17 @@ interface EmailOptions{
 }
 
 const sendEmail = async (options: EmailOptions) =>{
-//create a transporter
 const transporter = nodemailer.createTransport({
-host: process.env.EMAIL_HOST,
-port: process.env.EMAIL_PORT,
-auth:{
-    user:process.env.EMAIL_USER,
-    pass:process.env.EMAIL_PASSWORD
-}
-})  
+  pool: true,
+  host: process.env.EMAIL_HOST,
+  port: parseInt(`process.env.EMAIL_PORT`),
+  secure: false, // or 'STARTTLS'
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASSWORD
+  }
+});
+
 
 //Define email options
 const emailOptions ={
