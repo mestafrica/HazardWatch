@@ -1,8 +1,8 @@
 import jwt from 'jsonwebtoken';
-import {NextFunction, Request, Response} from "express";
+import { NextFunction, Request, Response } from "express";
 import IUser from '../models/user';
 import { Token } from '../models/token';
-import sendEmail from 'utils/emails/sendEmail';
+import sendEmail from '../utils/emails/sendEmail';
 import crypto from 'crypto';
 import bcrypt from 'bcrypt';
 
@@ -22,9 +22,8 @@ interface IResetPassword {
 
 
 //set up the password reset request      //Get user based on posted email
-export const requestPasswordReset = async (req:Request, res:Response , next:NextFunction,{ email }: IRequestPasswordReset): Promise<any> => {
+export const requestPasswordReset = async (req: Request, res: Response, next: NextFunction, { email }: IRequestPasswordReset): Promise<any> => {
   const user = await IUser.findOne({ email });
-
 
   //if user does not exist exist,pass error
   if (!user) {
@@ -95,30 +94,25 @@ export const resetPassword = async ({ userId, token, password }: IResetPassword)
     throw new Error('Invalid or expired password reset token');
   }
 
-
   //hash the new password
   const hash: string = await bcrypt.hash(password, bcryptSalt);
 
   //update user account with the new password
   await IUser.updateOne({ _id: userId }, { $set: { password: hash } }, { new: true });
 
-const user = await IUser.findById(userId);
-try {
+  const user = await IUser.findById(userId);
+
+  if (user) {
     await sendEmail({
       email: user.email,
       subject: 'Password change received',
-      message:"Kindly use the link to change your password.",
+      message: "Kindly use the link to change your password.",
     });
-} catch (error) {
-  
-}
+  } else {
+    throw new Error('User not found');
+  }
 
   await passwordResetToken.deleteOne();
   return true;
 };
 
-
-// export default {
-//   resetPassword,
-//   requestPasswordReset
-// }

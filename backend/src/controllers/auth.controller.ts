@@ -5,7 +5,11 @@ import { requestPasswordReset, resetPassword } from "../services/auth.service"
 export const resetPasswordRequestController = async (req:any, res:any, next:any) => {
    try {
      const requestPasswordResetService = await requestPasswordReset(
-         req.body.email
+         req.body.userId,
+         req.body.email, 
+         req.body.token,
+         req.body.password
+
      );
      return res.json(requestPasswordResetService);
    } catch (error) {

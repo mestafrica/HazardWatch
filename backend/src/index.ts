@@ -9,8 +9,8 @@ import dotenv from 'dotenv';
 import config from './config/config'
 import cors from "cors";
 import "express-async-errors";
-import { resetPasswordRequestController } from 'controllers/auth.controller';
-import { resetPasswordController } from 'controllers/auth.controller';
+import { resetPasswordRequestController } from './controllers/auth.controller';
+import { resetPasswordController } from './controllers/auth.controller';
 
 
 
@@ -74,8 +74,8 @@ router.use((req, res, next) => {
 router.use('/users',userRoutes);
 router.use('/hazard',hazardRoutes);
 router.use('/api', userRoutes);
-router.use('api', resetPasswordController);
-router.use('api', resetPasswordRequestController);
+router.use('/api', resetPasswordController);
+router.use('/api', resetPasswordRequestController);
 
 
 
