@@ -5,6 +5,7 @@ import mongoose from 'mongoose'
 import logging from './config/logging'
 import userRoutes from './router/user'
 import hazardRoutes from './router/hazardtypes'
+import hazardReport from './router/hazardreport'
 import dotenv from 'dotenv';
 import config from './config/config'
 
@@ -63,6 +64,7 @@ router.use((req, res, next) => {
 
 router.use('/users',userRoutes)
 router.use('/hazard',hazardRoutes)
+router.use('/hazard',hazardReport)
 
 router.use('/api', userRoutes)
 

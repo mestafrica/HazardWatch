@@ -9,7 +9,8 @@ const UserSchema: Schema = new Schema({
     password: {type: String, required:true},
     confirmPassword: {type: String, required:true},
     role: {type: String, default: 'user', enum: ['admin', 'user']},
-    reports: [{type: Types.ObjectId, ref: 'Reports'}]
+    reports: [{type: Types.ObjectId, ref: 'Reports'}],
+    hazardreport: [{ type: mongoose.Schema.Types.ObjectId, ref: 'HazardReport' }],
 },
 {
     timestamps:true

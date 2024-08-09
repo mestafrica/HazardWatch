@@ -6,14 +6,11 @@ import IUser from '../interfaces/user';
 const NAMESPACE = 'Auth';
 
 const signJWT = (user: IUser, callback: (error: Error | null, token: string | null) => void): void => {
-    // const timeSinchEpoch = new Date().getTime();
-    // const expirationTime = timeSinchEpoch + Number(config.server.token.expireTime) * 100000;
-    // const expirationTimeInSeconds = Math.floor(expirationTime / 1000);
 
     logging.info('Auth', `Attempting to sign for token for ${user.userName}`);
 
     const payload = {
-        id: user._id.toString(),   // Ensure user ID is in the payload
+        id: user._id.toString(), 
         userName: user.userName,
         role: user.role
     };

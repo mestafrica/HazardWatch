@@ -1,31 +1,39 @@
-import mongoose from 'mongoose'
+import mongoose from 'mongoose';
 
 // Define schema
-
 const UserSchema = new mongoose.Schema({
-    userName:{type:String, required:true},
-    email:{type:String, required:true},
-    authentication:{
-        password:{type:String, required: true, select:false},
-        salt:{type:String , select:false},
-        sessionToken:{type:String, select:false},
+    userName: { type: String, required: true },
+    email: { type: String, required: true },
+    authentication: {
+        password: { type: String, required: true, select: false },
+        salt: { type: String, select: false },
+        sessionToken: { type: String, select: false },
     },
 });
 
-export const UserModel = mongoose.model('User', UserSchema)
+// Create model
+export const UserModel = mongoose.model('User', UserSchema);
 
-
-//function to get users
+// Function to get all users
 export const getUser = () => UserModel.find();
-export const getUserByEmail = (email:string) => UserModel.findOne({email});
-export const getUserBySessionToken = (sessionToken:string) => UserModel.findOne({
-    'authentication.sessionToken':sessionToken,
-});
-export const getUserById = (id:string) => UserModel.findOne({id});
-export const createUser = (values: Record<string, any>) => new UserModel(values).save().then((user) => user.toObject());
-export const deleteUserById = (id:string) => UserModel.findOne({_id: id});
 
-export const updateUserByEmail = (id:string, values: Record<string, any>) => UserModel.findByIdAndUpdate(id, values);
+// Function to get a user by email
+export const getUserByEmail = (email: string) => UserModel.findOne({ email });
 
+// Function to get a user by session token
+export const getUserBySessionToken = (sessionToken: string) => 
+    UserModel.findOne({ 'authentication.sessionToken': sessionToken });
 
+// Function to get a user by ID
+export const getUserById = (id: string) => UserModel.findById(id);
 
+// Function to create a new user
+export const createUser = (values: Record<string, any>) => 
+    new UserModel(values).save().then((user) => user.toObject());
+
+// Function to delete a user by ID
+export const deleteUserById = (id: string) => UserModel.findByIdAndDelete(id);
+
+// Function to update a user by ID
+export const updateUserById = (id: string, values: Record<string, any>) => 
+    UserModel.findByIdAndUpdate(id, values, { new: true });

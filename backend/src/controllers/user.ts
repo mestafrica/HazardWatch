@@ -3,10 +3,10 @@ import mongoose from 'mongoose';
 import bcryptjs from 'bcryptjs';
 import logging from '../config/logging';
 import User from '../models/user';
-import jwt from 'jsonwebtoken';
-import config from '../config/config';
+// import jwt from 'jsonwebtoken';
+// import config from '../config/config';
 import signJWT from '../functions/signJWT'
-import { createUserValidator, forgotPasswordValidator, loginValidator, registerValidator, updateUserValidator } from 'schema/user';
+import { createUserValidator, loginValidator, registerValidator, updateUserValidator } from '../schema/user';
 
 const NAMESPACE = 'User';
 
