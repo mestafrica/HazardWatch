@@ -3,7 +3,7 @@ import IResetPassword from 'interfaces/resetpassword';
 
 
 const resetPasswordSchema: Schema<IResetPassword> = new Schema({
-  resetToken: {
+  token: {
     type: String,
     required: true
   },

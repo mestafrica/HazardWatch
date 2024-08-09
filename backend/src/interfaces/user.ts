@@ -10,4 +10,6 @@ export default interface IUser extends Document{
     confirmPassword: string;
     role: string;
     reports: Types.ObjectId[];
+    createResetPasswordToken: string;
+    
 }

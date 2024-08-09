@@ -1,15 +1,18 @@
-import { NextFunction, Request, Response } from "express";
+import { NextFunction,Request, Response } from "express";
 import IUser from '../models/user';
 import { Token } from '../models/token';
 import sendEmail from '../utils/emails/sendEmail';
 import crypto from 'crypto';
 import bcrypt from 'bcrypt';
+import mongoose from "mongoose";
 
-// const JWTSecret: string = process.env.JWT_SECRET || '';
-const JWTSecret: string = process.env.SERVER_TOKEN_SECRET || ''
-const bcryptSalt: number = 10; // adjust the salt value as needed
 
-interface IRequestPasswordReset {
+
+// // // const JWTSecret: string = process.env.JWT_SECRET || '';
+// // const JWTSecret: string = process.env.SERVER_TOKEN_SECRET || ''
+const bcryptSalt: number = 10; 
+
+interface IForgotPassword{
   email: string;
 }
 
@@ -17,31 +20,46 @@ interface IResetPassword {
   userId: string;
   token: string;
   password: string;
+
+}
+
+interface IUser {
+  get(arg0: string): string;
+  username: string;
+  email: string;
+  confirmPassword:string;
+  passwordResetToken:string;
+  passwordResetTokenExpires :string;
+  passwordChangedAt:string;
+  _id: mongoose.Types.ObjectId;
+}
+
+interface RequestWithBody extends Request {
+  body: any;
+}
+
+interface ResponseWithStatus extends Response {
+  status: (statusCode: number) => this;
 }
 
 
-//set up the password reset request      //Get user based on posted email
-const requestPasswordReset = async (req: Request, res: Response, next: NextFunction)=> {
-  //get the user email
+
+//set up the password reset request 
+export const forgotPassword = async (req:Request,res:Response, next:NextFunction)=> {
+  //GET the user based on posted email
   try {
     const email: string = req.body.email;
+    const user = IUser.findOne({email:req.body.email})
   
     //check if it is an existing user
-    const user = await IUser.findOne({email}).exec();
+    // await IUser.findOne({email}).exec();
   
-    //if user does not exist exist,pass error
+    //if user does not exist,pass error
     if (!user) {
       throw new Error('User does not exist');
-    }else{
-  
-  //get a token with the user id
-    //    let token = await Token.findOne({ userId: user._id });
-  
-    //    //if token exists,delete the one sent
-    // if (token) {
-    //   await token.deleteOne();
-    // }
-    //generate random plain reset token to be sent to user //specify size 32* and type hex*
+    }
+    else{
+    //GENERATE a random plain reset token to be sent to user //specify size 32* and type hex*
     const resetToken: string = crypto.randomBytes(32).toString('hex');
   
     //create a hash of the token 
@@ -49,7 +67,7 @@ const requestPasswordReset = async (req: Request, res: Response, next: NextFunct
   
     //save the id,token and time created in the database.
     await new Token({
-      userId: user._id,
+      userId: mongoose.Types.ObjectId,
       token: hash,
       createdAt: Date.now() * 10 * 60 * 1000,  //expires in 10mins
     }).save();
@@ -57,12 +75,12 @@ const requestPasswordReset = async (req: Request, res: Response, next: NextFunct
   
     //Send the token back to the user's email
     //reset password link contains the token and userId which will be used to verify the user's identity before reseting the password
-    const resetUrl = `$(req.protocol)://$(req.get('host))/api/v1/users/resetPassword/${resetToken}`
-    const message = 'We have received the password request.Please use the link below to reset your password.\n\n${"resetUrl"}\n\nThis reset password will be valid for only 10 minutes.'
+    const resetUrl: string = `${req.protocol}://${req.get('host')}/api/v1/users/resetPassword/${resetToken}`;
+    const message = 'We have received the password request.Please use the link below to reset your password.\n\n${resetUrl}\n\nThis reset password will be valid for only 10 minutes.'
   
     try {
       await sendEmail({
-        email: user.email,
+        email: user.get('email') as string,
         subject: 'Password change received',
         message: message,
       });
@@ -74,9 +92,8 @@ const requestPasswordReset = async (req: Request, res: Response, next: NextFunct
       });
   
     } catch (error) {
-      user.save({ validateBeforeSave: false })
   
-      new Error('There was an error sending password.Please try again later')
+         new Error('There was an error sending password.Please try again later')
     }
 };
 } catch (error) {
@@ -87,14 +104,12 @@ const requestPasswordReset = async (req: Request, res: Response, next: NextFunct
 
 
 
-
 //send back the token,new password, and userId
-const resetPassword = async ({ userId, token, password }: IResetPassword): Promise<boolean> => {
+export const resetPassword = async ({ userId, token, password }: IResetPassword): Promise<boolean> => {
   let passwordResetToken = await Token.findOne({ userId });
   if (!passwordResetToken) {
     throw new Error('Invalid or expired password reset token');
   };
-
 
 
   //compare the token the server received with the hashed version in the database
@@ -125,7 +140,5 @@ const resetPassword = async ({ userId, token, password }: IResetPassword): Promi
   return true;
 };
 
-export default{
-  resetPassword,
-  requestPasswordReset
-}
+
+
