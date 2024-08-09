@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import mongoose from 'mongoose';
 import HazardReport from '../models/hazardreport'; 
-import User from '../models/user';
+// import User from '../models/user';
 import { hazardreportSchema } from '../schema/hazardreport';
 
 const NAMESPACE = 'HazardReport';

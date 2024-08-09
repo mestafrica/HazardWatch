@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken';
 import config from '../config/config';
 import logging from '../config/logging';
 import { Request, Response, NextFunction } from 'express';
-import User from '../models/user';
+import {UserModel} from '../models/user';
 import { roles } from '../config/roles';
 
 const NAMESPACE = 'Auth';
@@ -49,7 +49,7 @@ const hasPermission = (permission: string) => {
                 return res.status(401).json('Unauthorized: No user ID provided.');
             }
             // Find user by id
-            const user = await User.findById(userId);
+            const user = await UserModel.findById(userId);
             if (!user) {
                 return res.status(404).json('User not found.');
             }

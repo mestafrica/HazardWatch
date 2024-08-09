@@ -2,8 +2,9 @@ import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import config from '../config/config';
 import logging from '../config/logging';
-import User from '../models/user';
+// import UserModel from '../models/user';
 import IUser from '../interfaces/user';
+import { UserModel } from '../models/user';
 
 const NAMESPACE = 'Auth';
 
@@ -22,7 +23,7 @@ const extractJWT = (req: Request, res: Response, next: NextFunction) => {
             } else {
                 if (typeof decoded === 'object' && 'id' in decoded) {
                     try {
-                        const user = await User.findById(decoded.id).exec();
+                        const user = await UserModel.findById(decoded.id).exec();
                         if (user) {
                             (req as any).user = user; // Type assertion to avoid TypeScript errors
                             next();
