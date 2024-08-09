@@ -1,7 +1,6 @@
 import express from 'express';
 import controller from '../controllers/user';
 import {checkAuth, hasPermission } from '../middlewares/auth';
-// import {forgotPassword, resetPassword} from "../services/auth"
 
 
 const router = express.Router();
