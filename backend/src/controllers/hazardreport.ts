@@ -2,61 +2,38 @@ import { NextFunction, Request, Response } from 'express';
 import mongoose from 'mongoose';
 import HazardReport from '../models/hazardreport'; 
 // import User from '../models/user';
+import { UserModel } from '../models/user';
 import { hazardreportSchema } from '../schema/hazardreport';
 
 const NAMESPACE = 'HazardReport';
 
 const createHazardReport = async (req: Request, res: Response, next: NextFunction) => {
     try {
-                // Validate request body and files
-                const { error, value } = hazardreportSchema.validate({
-                    ...req.body,
-                    // images: fileNames
-                    // images: req.files?.images[0].fileName,
-                });
-        
-                if (error) {
-                    console.error('Validation Error:', error.details[0].message);
-                    return res.status(400).json({ message: error.details[0].message });
-                }
-               
-        const {
-            title,
-            hazardtype, 
-            description,
-            images,
-            longitude,
-            latitude,
-            city,
-            country 
-        } = req.body;
-
-            // Create hazard report
-            const _hazardreports = new HazardReport({
-                _id: new mongoose.Types.ObjectId(),
-                title,
-                hazardtype,
-                description,
-                longitude,
-                latitude,
-                city,
-                country,
-                images: images
-            });
-        // Ensure files are processed correctly
-        // const fileNames = (req.files as Express.Multer.File[])?.map((file) => file.filename) || [];
-    
-
-        const hazardreport = await _hazardreports.save();
-
-        // Return success response
-        return res.status(201).json({
-            message: 'Hazard Report created successfully',
-            hazardreport
+        const { error, value } = hazardreportSchema.validate({  
+            ...req.body,
+            images: (req.files as Express.Multer.File[] | undefined)?.map(file => file.filename) || [] // Handle multiple files
         });
-    } catch (error) {
-        console.error('Error creating hazard report:', error);
-        next(error); 
+    
+        if (error) {
+            return res.status(400).json({ message: error.details[0].message });
+        }
+    
+        const userId = (req.session as any)?.user?.id || (req as any)?.user?.id; // Type assertion for session and request
+    
+        const user = await UserModel.findById(userId);
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+    
+        const hazardReport = await HazardReport.create({ ...value, user: userId });
+    
+        user.hazardreport.push(hazardReport._id as mongoose.Types.ObjectId);
+        await user.save();
+    
+        return res.status(201).json({ message: 'Hazard Report created successfully', hazardReport });
+    } catch (err) {
+        console.error(NAMESPACE, (err as Error).message, err);
+        next(err); // Properly pass the error to the next middleware
     }
 };
 

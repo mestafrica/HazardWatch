@@ -15,7 +15,7 @@ interface IUser extends mongoose.Document {
     password: string;
     confirmPassword?: string;
     role: 'admin' | 'user';
-    hazardreport?: mongoose.Types.ObjectId[];
+    hazardreport: mongoose.Types.ObjectId[];
     authentication: IAuthentication;
 }
 
