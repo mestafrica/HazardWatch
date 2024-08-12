@@ -20,7 +20,7 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
         }
 
         // Hash the password
-        const hashedPassword = await bcryptjs.hash(value.password, 10);
+        const hashedPassword = await bcryptjs.hashSync(value.password, 10);
         console.log('Hashed Password:', hashedPassword);
 
         // Create new user
