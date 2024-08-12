@@ -23,22 +23,13 @@ const SERVER_TOKEN_SECRET =
 
 
 
-const BCRYPT_SALT=10;
-const EMAIL_USER = '306194eb628069';
-const EMAIL_PASSWORD ='253128ec552d5f';
-const EMAIL_HOST ='sandbox.smtp.mailtrap.io';
-const EMAIL_PORT ='25'
 
 
 const config = {
   mongo: {
     url: MONGO_URL,
     options: MONGO_OPTIONS,
-    bcrypt:BCRYPT_SALT,
-    email:EMAIL_USER,
-    pass:EMAIL_PASSWORD,
-    Host:EMAIL_HOST,
-    port:EMAIL_PORT
+    
   },
   server: {
     hostname: SERVER_HOSTNAME,

@@ -1,144 +1,137 @@
 import { NextFunction,Request, Response } from "express";
 import IUser from '../models/user';
-import { Token } from '../models/token';
-import sendEmail from '../utils/emails/sendEmail';
-import crypto from 'crypto';
 import bcrypt from 'bcrypt';
-import mongoose from "mongoose";
+import { forgotPasswordValidator, loginValidator, resetPasswordValidator } from "../schema/user";
+import * as jwt from 'jsonwebtoken';
+import { ResetTokenModel } from "../models/token";
+import { mailTransport } from "../utils/sendEmail";
 
 
 
-// // // const JWTSecret: string = process.env.JWT_SECRET || '';
-// // const JWTSecret: string = process.env.SERVER_TOKEN_SECRET || ''
-const bcryptSalt: number = 10; 
-
-interface IForgotPassword{
-  email: string;
-}
-
-interface IResetPassword {
-  userId: string;
-  token: string;
-  password: string;
-
-}
-
-interface IUser {
-  get(arg0: string): string;
-  username: string;
-  email: string;
-  confirmPassword:string;
-  passwordResetToken:string;
-  passwordResetTokenExpires :string;
-  passwordChangedAt:string;
-  _id: mongoose.Types.ObjectId;
-}
-
-interface RequestWithBody extends Request {
-  body: any;
-}
-
-interface ResponseWithStatus extends Response {
-  status: (statusCode: number) => this;
-}
 
 
-
-//set up the password reset request 
-export const forgotPassword = async (req:Request,res:Response, next:NextFunction)=> {
-  //GET the user based on posted email
+export const token = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const email: string = req.body.email;
-    const user = IUser.findOne({email:req.body.email})
-  
-    //check if it is an existing user
-    // await IUser.findOne({email}).exec();
-  
-    //if user does not exist,pass error
-    if (!user) {
-      throw new Error('User does not exist');
-    }
-    else{
-    //GENERATE a random plain reset token to be sent to user //specify size 32* and type hex*
-    const resetToken: string = crypto.randomBytes(32).toString('hex');
-  
-    //create a hash of the token 
-    const hash: string = await bcrypt.hash(resetToken, bcryptSalt);
-  
-    //save the id,token and time created in the database.
-    await new Token({
-      userId: mongoose.Types.ObjectId,
-      token: hash,
-      createdAt: Date.now() * 10 * 60 * 1000,  //expires in 10mins
-    }).save();
-  
-  
-    //Send the token back to the user's email
-    //reset password link contains the token and userId which will be used to verify the user's identity before reseting the password
-    const resetUrl: string = `${req.protocol}://${req.get('host')}/api/v1/users/resetPassword/${resetToken}`;
-    const message = 'We have received the password request.Please use the link below to reset your password.\n\n${resetUrl}\n\nThis reset password will be valid for only 10 minutes.'
-  
-    try {
-      await sendEmail({
-        email: user.get('email') as string,
-        subject: 'Password change received',
-        message: message,
+      // Validate request
+      const { value, error } = loginValidator.validate(req.body);
+      if (error) {
+          return res.status(422).json(error);
+      }
+      // Find a user with their unique identifier
+      const user = await IUser.findOne({
+          $or: [
+              { username: value.username },
+              { email: value.email },
+          ]
       });
-  
-  
-      return res.status(200).json({
-        status: 'success',
-        message: 'password reset link sent to the user'
+      if (!user) {
+          return res.status(401).json('User Not Found');
+      }
+      // Verify their password
+      const correctPassword = bcrypt.compareSync(value.password, user.password);
+      if (!correctPassword) {
+          return res.status(401).json('Invalid Credentials');
+      }
+      // Create a token
+      const token = jwt.sign(
+          { id: user.id },
+          process.env.SERVER_TOKEN_SECRET ?? 'defaultSecret',
+          // process.env.JWT_PRIVATE_KEY,
+          { expiresIn: '72h' }
+      );
+      // Return response
+      res.status(200).json({
+          message: 'User Logged In',
+          accessToken: token
       });
-  
-    } catch (error) {
-  
-         new Error('There was an error sending password.Please try again later')
-    }
-};
-} catch (error) {
-    
+  } catch (error) {
+      next(error);
+  }
 }
-};
 
 
 
 
-//send back the token,new password, and userId
-export const resetPassword = async ({ userId, token, password }: IResetPassword): Promise<boolean> => {
-  let passwordResetToken = await Token.findOne({ userId });
-  if (!passwordResetToken) {
-    throw new Error('Invalid or expired password reset token');
-  };
 
-
-  //compare the token the server received with the hashed version in the database
-  const isValid: boolean = await bcrypt.compare(token, passwordResetToken.token);
-  if (!isValid) {
-    throw new Error('Invalid or expired password reset token');
+export const forgotPassword = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+      // Validate request
+      const { value, error } = forgotPasswordValidator.validate(req.body);
+      if (error) {
+          return res.status(422).json(error);
+      }
+      // Find a user with provided email
+      const user = await IUser.findOne({ email: value.email });
+      if (!user) {
+          return res.status(404).json('User Not Found');
+      }
+      // Generate reset token
+      const resetToken = await ResetTokenModel.create({ userId: user.id });
+      // Send reset email
+      await mailTransport.sendMail({
+          to: value.email,
+          subject: 'Reset Your Password',
+          html: `
+          <h1>Hello ${user.userName}</h1>
+          <h1>Please follow the link below to reset your password.</h1>
+          <a href="${process.env.FRONTEND_URL}/reset-password/${resetToken.id}">Click Here</a>
+          `
+      });
+      // Return response
+      res.status(200).json('Password Reset Mail Sent!');
+  } catch (error) {
+      next(error);
   }
+}
 
-  //hash the new password
-  const hash: string = await bcrypt.hash(password, bcryptSalt);
 
-  //update user account with the new password
-  await IUser.updateOne({ _id: userId }, { $set: { password: hash } }, { new: true });
 
-  const user = await IUser.findById(userId);
-
-  if (user) {
-    await sendEmail({
-      email: user.email,
-      subject: 'Password change received',
-      message: "Kindly use the link to change your password.",
-    });
-  } else {
-    throw new Error('User not found');
+export const verifyResetToken = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+      // Find Reset Token by id
+      const resetToken = await ResetTokenModel.findById(req.params.id);
+      if (!resetToken) {
+          return res.status(404).json('Reset Token Not Found');
+      }
+      // Check if token is valid
+      if (resetToken.expired || (Date.now() >= new Date(resetToken.expiresAt).valueOf())) {
+          return res.status(409).json('Invalid Reset Token');
+      }
+      // Return response
+      res.status(200).json('Reset Token is Valid!');
+  } catch (error) {
+      next(error);
   }
-
-  await passwordResetToken.deleteOne();
-  return true;
-};
+}
 
 
 
+
+export const resetPassword = async (req: Request, res: Response, next: NextFunction ) => {
+  try {
+      // Validate request
+      const { value, error } = resetPasswordValidator.validate(req.body);
+      if (error) {
+          return res.status(422).json(error);
+      }
+      // Find Reset Token by id
+      const resetToken = await ResetTokenModel.findById(value.resetToken);
+      if (!resetToken) {
+          return res.status(404).json('Reset Token Not Found');
+      }
+      // Check if token is valid
+      if (resetToken.expired || (Date.now() >= new Date(resetToken.expiresAt).valueOf())) {
+          return res.status(409).json('Invalid Reset Token');
+      }
+      // Encrypt user password
+      const hashedPassword = bcrypt.hashSync(value.password, 10);
+      // Update user password
+      await IUser.findByIdAndUpdate(resetToken.userId, { password: hashedPassword });
+      // Expire reset token
+      await ResetTokenModel.findByIdAndUpdate(value.resetToken, { expired: true });
+      // Return response
+      res.status(200).json('Password Reset Successful!');
+  } catch (error) {
+      next(error);
+  }
+}

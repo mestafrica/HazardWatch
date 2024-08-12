@@ -9,7 +9,9 @@ import dotenv from 'dotenv';
 import config from './config/config'
 import cors from "cors";
 import "express-async-errors";
-import { forgotPassword, resetPassword } from '../src/controllers/auth';
+import { forgotPassword, resetPassword,verifyResetToken } from '../src/controllers/auth';
+
+
 
 
 
@@ -77,6 +79,7 @@ router.use('/hazard',hazardRoutes);
 router.use('/api', userRoutes);
 router.use('/api', forgotPassword)
 router.use('/api', resetPassword)
+router.use('/api', verifyResetToken)
 
 
 

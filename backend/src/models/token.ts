@@ -1,22 +1,18 @@
-import mongoose, { Schema, Types, model } from "mongoose";
+import { Schema, Types, model } from "mongoose";
 
 
-const tokenSchema = new Schema({
-    userId: {
-        type: mongoose.Types.ObjectId,
-        required: true,
-        ref: "user",
-    },
-    token: {
-        type: String,
-        required: true,
-    },
-    createdAt: {
+
+
+const resetTokenSchema = new Schema({
+    userId: { type: Types.ObjectId, required: true, ref: 'User' },
+    expired: { type: Boolean, default: false },
+    expiresAt: {
         type: Date,
-        default: Date.now,
-        expires: 3600,//in secs
+        default: () => new Date().setHours(new Date().getHours() + 2)
     }
-
+}, {
+    timestamps: true
 });
 
-export const Token = model('token', tokenSchema)
+
+export const ResetTokenModel = model('ResetToken', resetTokenSchema);

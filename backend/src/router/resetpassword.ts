@@ -1,11 +1,13 @@
 import express from 'express';
-import { forgotPassword, resetPassword } from "../controllers/auth";
+import { forgotPassword, resetPassword, verifyResetToken } from "../controllers/auth";
 
 
 
-const router = express.Router();
+export const forgotPasswordRouter = express.Router();
 
 
-router.post('users/forgotpassword', forgotPassword);
+forgotPasswordRouter.post('/users/forgot-password', forgotPassword);
 
-router.patch('users/resetpassword/:token', resetPassword);
+forgotPasswordRouter.get('/users/reset-token/:id', verifyResetToken);
+
+forgotPasswordRouter.post('/users/reset-password', resetPassword);
