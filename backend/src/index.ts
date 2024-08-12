@@ -48,7 +48,7 @@ app.use((req, res, next) => {
 
 
 //security middleware
-router.use(cors());
+app.use(cors());
 
 //Parse the body of the request 
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -74,12 +74,12 @@ app.use((req, res, next) => {
 
 // Use Route
 
-router.use('/users',userRoutes);
-router.use('/hazard',hazardRoutes);
-router.use('/api', userRoutes);
-router.use('/api', forgotPassword)
-router.use('/api', resetPassword)
-router.use('/api', verifyResetToken)
+app.use('/users',userRoutes);
+app.use('/hazard',hazardRoutes);
+app.use('/api', userRoutes);
+app.use('/api', forgotPassword)
+app.use('/api', resetPassword)
+app.use('/api', verifyResetToken)
 
 
 
