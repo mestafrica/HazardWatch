@@ -1,6 +1,6 @@
 import express from 'express';
 import controller from '../controllers/user';
-import {checkAuth, hasPermission } from 'middlewares/auth';
+import {checkAuth, hasPermission } from '../middlewares/auth';
 
 
 const router = express.Router();
@@ -13,6 +13,8 @@ router.patch('/users/:id', checkAuth, hasPermission('update_user'), controller.e
 router.delete('/users/:id', checkAuth, hasPermission('delete_user'), controller.deleteUser);
 router.post('/users/logout', checkAuth, controller.logout);
 router.get('/users', checkAuth, hasPermission('read_users'), controller.getAllUsers);
+
+
 
 // Export router
 export default router;
