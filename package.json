@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "react-google-autocomplete": "^2.7.3"
+  }
+}
