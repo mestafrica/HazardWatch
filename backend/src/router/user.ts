@@ -1,16 +1,20 @@
 import express from 'express';
-import { register, login, createUser, editUser, deleteUser, logout, getAllUsers } from '../controllers/user';
-import { checkAuth, hasPermission } from '../middlewares/auth';
+import controller from '../controllers/user';
+import {checkAuth, hasPermission } from '../middlewares/auth';
+
 
 const router = express.Router();
 
 // Define routes
-router.post('/register', register);  // Ensure this route matches your request URL
-router.post('/login', login);
-router.patch('/', checkAuth, hasPermission('create_user'), createUser);
-router.patch('/:id', checkAuth, hasPermission('update_user'), editUser);
-router.delete('/:id', checkAuth, hasPermission('delete_user'), deleteUser);
-router.post('/logout', checkAuth, logout);
-router.get('/', checkAuth, hasPermission('read_users'), getAllUsers);
+router.post('/users/register', controller.register);
+router.post('/users/login', controller.login);
+router.patch('/users/', checkAuth, hasPermission('create_user'), controller.createUser);
+router.patch('/users/:id', checkAuth, hasPermission('update_user'), controller.editUser);
+router.delete('/users/:id', checkAuth, hasPermission('delete_user'), controller.deleteUser);
+router.post('/users/logout', checkAuth, controller.logout);
+router.get('/users', checkAuth, hasPermission('read_users'), controller.getAllUsers);
 
+
+
+// Export router
 export default router;

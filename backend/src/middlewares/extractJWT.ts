@@ -1,10 +1,7 @@
-import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import config from '../config/config';
 import logging from '../config/logging';
-// import UserModel from '../models/user';
-import IUser from '../interfaces/user';
-import { UserModel } from '../models/user';
+import { Request, Response, NextFunction } from 'express';
 
 const NAMESPACE = 'Auth';
 
@@ -14,35 +11,16 @@ const extractJWT = (req: Request, res: Response, next: NextFunction) => {
     const token = req.headers.authorization?.split(' ')[1];
 
     if (token) {
-        jwt.verify(token, config.server.token.secret, async (error, decoded) => {
+        jwt.verify(token, config.server.token.secret, (error, decoded) => {
             if (error) {
                 return res.status(404).json({
                     message: error.message,
                     error
                 });
             } else {
-                if (typeof decoded === 'object' && 'id' in decoded) {
-                    try {
-                        const user = await UserModel.findById(decoded.id).exec();
-                        if (user) {
-                            (req as any).user = user; // Type assertion to avoid TypeScript errors
-                            next();
-                        } else {
-                            return res.status(401).json({
-                                message: 'User not found'
-                            });
-                        }
-                    } catch (err) {
-                        return res.status(500).json({
-                            message: 'Error finding user',
-                            error: err
-                        });
-                    }
-                } else {
-                    return res.status(401).json({
-                        message: 'Invalid token'
-                    });
-                }
+                // Attach decoded token to res.locals for use in subsequent middleware or route handlers
+                res.locals.jwt = decoded;
+                next();
             }
         });
     } else {
@@ -53,9 +31,9 @@ const extractJWT = (req: Request, res: Response, next: NextFunction) => {
 };
 
 const checkAdmin = (req: Request, res: Response, next: NextFunction) => {
-    const user = (req as any).user as IUser;
+    const decoded = res.locals.jwt;
     
-    if (user && user.role === 'admin') {
+    if (decoded && decoded.role === 'admin') {
         next();
     } else {
         return res.status(403).json({

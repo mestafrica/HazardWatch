@@ -1,86 +1,116 @@
 import { NextFunction, Request, Response } from 'express';
+import mongoose from 'mongoose';
 import bcryptjs from 'bcryptjs';
-// import User from '../models/user';
-import signJWT from '../functions/signJWT'
-import { createUserValidator, loginValidator, registerValidator, updateUserValidator } from '../schema/user';
-import { UserModel } from '../models/user';
-import IUser from '../interfaces/user';
+import logging from '../config/logging';
+import User from '../models/user';
+import jwt from 'jsonwebtoken';
+import config from 'config/config';
+import signJWT from '../functions/signJWT';
+import bcrypt from "bcrypt";
+import { createUserValidator, forgotPasswordValidator, loginValidator, registerValidator, updateUserValidator } from '../schema/user';
 
 const NAMESPACE = 'User';
 
 
-// Function to register a user
-export const register = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-        // Validate request
-        const { value, error } = registerValidator.validate(req.body);
-        if (error) {
-            console.error('Validation Error:', error.details);
-            return res.status(422).json({ error: error.details });
-        }
+const isErrorWithMessage = (error: unknown): error is { message: string } => {
+    return (
+        typeof error === 'object' &&
+        error !== null &&
+        'message' in error &&
+        typeof (error as any).message === 'string'
+    );
+};
 
+
+// Function to register a user
+const register = async (req: Request, res: Response, next: NextFunction) => {
+       // Validate request
+       const { value, error } = registerValidator.validate(req.body);
+       if (error) {
+           return res.status(422).json(error);
+       }
+    const { firstName, lastName, email, userName, password, confirmPassword } = req.body;
+    // Check for all required fields
+    if (!firstName || !lastName || !email || !userName || !password || !confirmPassword) {
+        return res.status(400).json({ message: 'All fields are required' });
+    }
+    // Check if password and confirmPassword match
+    if (password !== confirmPassword) {
+        return res.status(400).json({ message: 'Passwords do not match' });
+    }
+    try {
         // Hash the password
-        const hashedPassword = await bcryptjs.hashSync(value.password, 10);
-        console.log('Hashed Password:', hashedPassword);
+        const hash = await bcryptjs.hashSync(password, 10);
 
         // Create new user
-        const user = await UserModel.create({
-            ...value,
-            password: hashedPassword,
-            confirmPassword: hashedPassword,
+        const _user = new User({
+            _id: new mongoose.Types.ObjectId(),
+            firstName,
+            lastName,
+            email,
+            userName,
+            password: hash,
+            confirmPassword: hash
         });
-        console.log('User Created:', user);
 
-        return res.status(201).json({ message: 'User is Registered', user });
+        // Save the user
+        const user = await _user.save();
+
+        return res.status(201).json({ user });
     } catch (error) {
-        console.error('Registration Error:', error);
-        next(error);
+        logging.error(NAMESPACE, 'Error saving user', error);
+        const errorMessage = isErrorWithMessage(error) ? error.message : 'Unknown error occurred';
+        return res.status(500).json({
+            message: errorMessage,
+            error
+        });
     }
 };
+
 
 // Function to login (token)
-export const login = async (req: Request, res: Response, next: NextFunction) => {
+const login = async (req: Request, res: Response, next: NextFunction) => {
+    const { userName, password } = req.body;
     try {
-        // Validate request
-        const { value, error } = loginValidator.validate(req.body);
-        if (error) {
-            return res.status(422).json(error);
-        }
-
-        // Find user by username or email
-        const user = await UserModel.findOne({
-            $or: [
-                { userName: value.userName },
-                { email: value.email },
-            ]
-        });
-
-        if (!user) {
-            return res.status(401).json('User Not Found');
-        }
-        // Check password
-        const isMatch = bcryptjs.compareSync(value.password, user.password);
-        if (!isMatch) {
-            return res.status(401).json({ message: 'Invalid Credentials' });
-        }
-        // Convert user document to plain object
-        const users = user.toObject() as IUser;
-        // Sign JWT
-        signJWT(users, (signError, token) => {
-            if (signError) {
-                return res.status(500).json({ error: 'Failed to sign JWT' });
-            }
-
-            if (token) {
-                return res.status(200).json({ token });
-            }
-        });
-    } catch (error) {
-        next(error);
-    }
+          // Validate request
+          const { value, error } = loginValidator.validate(req.body);
+          if (error) {
+              return res.status(422).json(error);
+          }
+        const user = await User.findOne({ userName })
+            .exec();
+                if (!user) {
+                    return res.status(401).json({
+                        message: 'Unauthorized'
+                    });
+                }
+    
+                const isMatch = bcryptjs.compare(password, user.password)
+                    if (!isMatch) {
+                        return res.status(401).json({
+                            message: 'Password Mismatch'
+                        });
+                    }
+                    // Sign JWT using the signJWT function
+                    signJWT(user, (signError, token) => {
+                        if (signError) {
+                            return res.status(500).json({
+                                message: isErrorWithMessage(signError) ? signError.message : 'Unknown error occurred',
+                                error: signError
+                            });
+                        } else if (token) {
+                            return res.status(200).json({ token });
+                        }
+                    });
+    } catch(err) {
+            logging.error(NAMESPACE, 'Error finding user', err);
+            return res.status(500).json({
+                message: isErrorWithMessage(err) ? err.message : 'Unknown error occurred',
+                error: err
+        
+            });
+        };
 };
-
-
 
 export const createUser = async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -92,10 +122,16 @@ export const createUser = async (req: Request, res: Response, next: NextFunction
         // Encrypt user password
         const hashedPassword = bcryptjs.hashSync(value.password, 10);
         // Create user
-        await UserModel.create({
+        await User.create({
             ...value,
             password: hashedPassword
         });
+        // Send email to user
+        // await mailTransport.sendMail({
+        //     to: value.email,
+        //     subject: "User Account Created!",
+        //     text: `Dear user,\n\nA user account has been created for you with the following credentials.\n\nUsername: ${value.username}\nEmail: ${value.email}\nPassword: ${value.password}\nRole: ${value.role}\n\nThank you!`,
+        // });
         // Return response
         res.status(201).json('User Created');
     } catch (error) {
@@ -104,7 +140,7 @@ export const createUser = async (req: Request, res: Response, next: NextFunction
 }
 
 // Function to edit user
-export const editUser = async (req: Request, res: Response, next: NextFunction) => {
+const editUser = async (req: Request, res: Response, next: NextFunction) => {
 
     try {
             // Validate request
@@ -112,7 +148,7 @@ export const editUser = async (req: Request, res: Response, next: NextFunction) 
             if (error) {
                 return res.status(422).json(error);
             }
-        const user = await UserModel.findByIdAndUpdate(
+        const user = await User.findByIdAndUpdate(
             req.params.id,
             value,
             { new: true }
@@ -127,18 +163,22 @@ export const editUser = async (req: Request, res: Response, next: NextFunction) 
             user
         });
     } catch (error) {
-        next(error)
+        console.error('Error:', error);
+        return res.status(500).json({
+            message: 'Error processing request',
+            error: error instanceof Error ? error.message : String(error)
+        });
     }
 };
 
 
 
 // Function to delete a user
-export const deleteUser = async (req: Request, res: Response, next: NextFunction) => {
+const deleteUser = async (req: Request, res: Response, next: NextFunction) => {
     const  userId  = req.params.id;
 
     try {
-        const user = await UserModel.findByIdAndDelete(userId).exec();
+        const user = await User.findByIdAndDelete(userId).exec();
 
         if (!user) {
             return res.status(404).json({
@@ -149,31 +189,36 @@ export const deleteUser = async (req: Request, res: Response, next: NextFunction
             message: 'User deleted successfully'
         });
     } catch (error) {
-      next(error)
+        console.error('Error:', error);
+        return res.status(500).json({
+            message: 'Error processing request',
+            error: error instanceof Error ? error.message : String(error)
+        });
     }
 };
 
 
 
 // Logout function
-export const logout = async (req: Request, res: Response, next: NextFunction) => {
+const logout = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        req.session.destroy((err) => {
-            if (err) {
-                return next(err);
-            }
-            res.status(200).json({ message: 'User logged out successfully' });
+        // Invalidate token (client-side logic is needed to actually remove the token)
+        return res.status(200).json({
+            message: 'User logged out successfully'
         });
     } catch (error) {
-        next(error);
+        console.error('Error:', error);
+        return res.status(500).json({
+            message: 'Error processing request',
+            error: error instanceof Error ? error.message : String(error)
+            });
     }
 };
 
 
-
 // Function to get all users
-export const getAllUsers = (req: Request, res: Response, next: NextFunction) => {
-    UserModel.find()
+const getAllUsers = (req: Request, res: Response, next: NextFunction) => {
+    User.find()
         .select('-password')
         .exec()
         .then((users) => {
@@ -183,7 +228,18 @@ export const getAllUsers = (req: Request, res: Response, next: NextFunction) => 
             });
         })
         .catch((error) => {
-        next(error)
+            logging.error(NAMESPACE, 'Error getting users', error);
+            return res.status(500).json({
+                message: isErrorWithMessage(error) ? error.message : 'Unknown error occurred',
+                error
+            });
         });
 };
 
+
+
+
+// Function for an admin to create a user
+
+
+export default { register, login, createUser, logout, editUser, deleteUser, getAllUsers };

@@ -1,42 +1,47 @@
 import { NextFunction, Request, Response } from 'express';
-import mongoose from 'mongoose';
-import HazardReport from '../models/hazardreport'; 
-// import User from '../models/user';
-import { UserModel } from '../models/user';
+import mongoose, { Types } from 'mongoose';
+import HazardReport from '../models/hazardreport';
+import User from '../models/user';
 import { hazardreportSchema } from '../schema/hazardreport';
+import { IHazardReport } from '../interfaces/hazardreport';
 
 const NAMESPACE = 'HazardReport';
 
 const createHazardReport = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const { error, value } = hazardreportSchema.validate({  
+        const { error, value } = hazardreportSchema.validate({
             ...req.body,
-            images: (req.files as Express.Multer.File[] | undefined)?.map(file => file.filename) || [] // Handle multiple files
+            images: (req.files as Express.Multer.File[] | undefined)?.map(file => file.filename) || []
         });
-    
+
         if (error) {
             return res.status(400).json({ message: error.details[0].message });
         }
-    
-        const userId = (req.session as any)?.user?.id || (req as any)?.user?.id; // Type assertion for session and request
-    
-        const user = await UserModel.findById(userId);
+
+        const userId = res.locals.jwt?.id;
+
+        if (!userId) {
+            return res.status(401).json({ message: "Unauthorized" });
+        }
+
+        const user = await User.findById(userId);
         if (!user) {
             return res.status(404).json({ message: "User not found" });
         }
-    
-        const hazardReport = await HazardReport.create({ ...value, user: userId });
-    
-        user.hazardreport.push(hazardReport._id as mongoose.Types.ObjectId);
+
+        // Create hazard report with explicit type
+        const hazardReport = await HazardReport.create(value) as IHazardReport & { _id: Types.ObjectId };
+
+        // Add the new hazard report's ID to the user's reports array
+        user.reports.push(hazardReport._id);
         await user.save();
-    
+
         return res.status(201).json({ message: 'Hazard Report created successfully', hazardReport });
-    } catch (err) {
-        console.error(NAMESPACE, (err as Error).message, err);
-        next(err); // Properly pass the error to the next middleware
+    } catch (error) {
+        console.error(NAMESPACE, (error as Error).message, error);
+        next(error);
     }
 };
-
 
 
 const getAllHazardReports = async (req: Request, res: Response, next: NextFunction) => {

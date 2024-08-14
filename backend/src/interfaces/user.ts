@@ -1,22 +1,16 @@
-import mongoose from 'mongoose';
 
-interface IAuthentication {
-    password: string;
-    salt?: string;
-    sessionToken?: string;
-}
+import { Document, Types } from 'mongoose';
 
-interface IUser extends mongoose.Document {
-    _id: mongoose.Types.ObjectId;
+export default interface IUser extends Document{
+    _id: Types.ObjectId;
     firstName: string;
     lastName: string;
     userName: string;
     email: string;
     password: string;
-    confirmPassword?: string;
-    role: 'admin' | 'user';
-    hazardreport: mongoose.Types.ObjectId[];
-    authentication: IAuthentication;
+    confirmPassword: string;
+    role: string;
+    reports: Types.ObjectId[];
+    createResetPasswordToken: string;
+    
 }
-
-export default IUser;
