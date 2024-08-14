@@ -1,21 +1,8 @@
 import express from 'express';
-import multer from 'multer';
 import controller from '../controllers/hazardreport';
 import { extractJWT, checkAdmin } from '../middlewares/extractJWT';
+import upload from 'middlewares/upload';
 
-
-// Multer setup for file uploads
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-      const uploadPath = 'src/uploads/';
-      console.log('Saving files to:', uploadPath); // Log the path for debugging
-      cb(null, uploadPath);
-  },
-  filename: (req, file, cb) => {
-      cb(null, Date.now() + '-' + file.originalname);
-  }
-});
-const upload = multer({ storage });
   
 const router = express.Router();
 
