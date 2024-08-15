@@ -66,5 +66,3 @@ export default mongoose.model<IUser>('User', UserSchema)
 
 //     return resetToken;
 // }
-
-

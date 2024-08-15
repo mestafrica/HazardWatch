@@ -1,3 +1,4 @@
+
 import { Document, Types } from 'mongoose';
 
 export default interface IUser extends Document{

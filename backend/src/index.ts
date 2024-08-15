@@ -5,6 +5,7 @@ import mongoose from 'mongoose'
 import logging from './config/logging'
 import userRoutes from './router/user'
 import hazardRoutes from './router/hazardtypes'
+import hazardReport from './router/hazardreport'
 import dotenv from 'dotenv';
 import config from './config/config'
 import cors from "cors";
@@ -76,6 +77,7 @@ app.use((req, res, next) => {
 
 app.use('/users',userRoutes);
 app.use('/hazard',hazardRoutes);
+app.use('/hazardreport',hazardReport);
 app.use('/api', userRoutes);
 app.use('/api', forgotPassword)
 app.use('/api', resetPassword)
@@ -109,7 +111,3 @@ app.use((error: Error, req: Request, res: Response, next: NextFunction) => {
     message: error.message
   });
 });
-
-
-
-
