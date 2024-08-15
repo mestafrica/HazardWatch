@@ -1,7 +1,7 @@
 import express from 'express';
 import controller from '../controllers/hazardreport';
 import { extractJWT, checkAdmin } from '../middlewares/extractJWT';
-import upload from 'middlewares/upload';
+import upload from '../middlewares/upload';
 
   
 const router = express.Router();

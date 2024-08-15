@@ -13,13 +13,6 @@ import "express-async-errors";
 import { forgotPassword, resetPassword,verifyResetToken } from '../src/controllers/auth';
 
 
-
-
-
-
-
-
-
 dotenv.config();
 
 const NAMESPACE = 'Server';
