@@ -11,7 +11,6 @@ export const registerValidator = Joi.object({
 
 export const loginValidator = Joi.object({
     userName: Joi.string(),
-    userName: Joi.string(),
     email: Joi.string().email(),
     password: Joi.string().required(),
 });
@@ -29,7 +28,6 @@ export const resetPasswordValidator = Joi.object({
 export const createUserValidator = Joi.object({
     firstName: Joi.string().required(),
     lastName: Joi.string().required(),
-    userName: Joi.string().required(),
     userName: Joi.string().required(),
     email: Joi.string().email().required(),
     password: Joi.string().required(),
