@@ -14,5 +14,7 @@ router.delete('/users/:id', checkAuth, hasPermission('delete_user'), controller.
 router.post('/users/logout', checkAuth, controller.logout);
 router.get('/users', checkAuth, hasPermission('read_users'), controller.getAllUsers);
 
+
+
 // Export router
 export default router;

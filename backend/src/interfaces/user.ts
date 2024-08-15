@@ -1,3 +1,4 @@
+
 import { Document, Types } from 'mongoose';
 
 export default interface IUser extends Document{
@@ -10,4 +11,6 @@ export default interface IUser extends Document{
     confirmPassword: string;
     role: string;
     reports: Types.ObjectId[];
+    createResetPasswordToken: string;
+    
 }

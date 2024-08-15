@@ -5,9 +5,12 @@ import mongoose from 'mongoose'
 import logging from './config/logging'
 import userRoutes from './router/user'
 import hazardRoutes from './router/hazardtypes'
+import hazardReport from './router/hazardreport'
 import dotenv from 'dotenv';
 import config from './config/config'
-
+import cors from "cors";
+import "express-async-errors";
+import { forgotPassword, resetPassword,verifyResetToken } from '../src/controllers/auth';
 
 
 dotenv.config();
@@ -37,6 +40,10 @@ app.use((req, res, next) => {
    next();
 });
 
+
+//security middleware
+app.use(cors());
+
 //Parse the body of the request 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
@@ -61,10 +68,16 @@ app.use((req, res, next) => {
 
 // Use Route
 
-app.use('/users',userRoutes)
-app.use('/hazard',hazardRoutes)
+app.use('/users',userRoutes);
+app.use('/hazard',hazardRoutes);
+app.use('/hazardreport',hazardReport);
+app.use('/api', userRoutes);
+app.use('/api', forgotPassword)
+app.use('/api', resetPassword)
+app.use('/api', verifyResetToken)
 
-app.use('/api', userRoutes)
+
+
 
 
 // Error handling for not found routes
@@ -91,6 +104,3 @@ app.use((error: Error, req: Request, res: Response, next: NextFunction) => {
     message: error.message
   });
 });
-
-
-

@@ -21,10 +21,15 @@ const SERVER_TOKEN_SECRET =
   process.env.SERVER_TOKEN_SECRET || 'defaultSecret';
 
 
+
+
+
+
 const config = {
   mongo: {
     url: MONGO_URL,
     options: MONGO_OPTIONS,
+    
   },
   server: {
     hostname: SERVER_HOSTNAME,
@@ -36,5 +41,7 @@ const config = {
     },
   },
 };
+
+
 
 export default config;

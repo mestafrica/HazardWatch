@@ -4,8 +4,9 @@ import bcryptjs from 'bcryptjs';
 import logging from '../config/logging';
 import User from '../models/user';
 import jwt from 'jsonwebtoken';
-import config from '../config/config';
-import signJWT from '../functions/signJWT'
+import config from 'config/config';
+import signJWT from '../functions/signJWT';
+import bcrypt from "bcrypt";
 import { createUserValidator, forgotPasswordValidator, loginValidator, registerValidator, updateUserValidator } from '../schema/user';
 
 const NAMESPACE = 'User';
