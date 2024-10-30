@@ -1,16 +1,51 @@
 import React, { useState } from "react";
 import { assets } from "../assets";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { toast, ToastContainer } from "react-toastify";
+import { apiSignup } from "./services/auth";
 
 const SignUp: React.FC = () => {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
+  const [loading, setLoading] = useState(false)
+  const navigate = useNavigate()
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log("Email:", email);
-    console.log("Password:", password);
-  };
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    try {
+      setLoading(true)
+      const formData = new FormData(event.target)
+      const firstName = formData.get("firstName")
+      const lastName = formData.get("lastName")
+      const email = formData.get("email")
+      const password = formData.get("password")
+      const confirmPassword = formData.get("confirmPassword")
+
+      console.log(firstName,lastName,email,password,confirmPassword);
+
+      if (password !== confirmPassword) {
+        toast.error("Passwords do not match!")
+        return
+      }
+      const payload = {firstName:firstName, lastName:lastName, email:email, password:password}
+      const response = await apiSignup(payload)
+      console.log(response.data)
+      toast.success("Sign up Successful")
+      navigate("/login")
+
+    }catch (error) {
+        toast.error("Signup failed. Please try again.")
+
+        console.log(error)
+
+      } finally {
+          setLoading(false)
+        
+      }
+    
+  
+  }
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
@@ -116,6 +151,7 @@ const SignUp: React.FC = () => {
           />
         </div>
       </div>
+      <ToastContainer/>
     </div>
   );
 };
