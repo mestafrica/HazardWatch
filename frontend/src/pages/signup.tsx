@@ -29,7 +29,7 @@ const SignUp: React.FC = () => {
         return
       }
       const payload = {firstName:firstName, lastName:lastName, email:email, password:password}
-      const response = await apiSignup(payload)
+      const response = await apiSignup (payload)
       console.log(response.data)
       toast.success("Sign up Successful")
       navigate("/login")
