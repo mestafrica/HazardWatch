@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import logImage from "../assets/images/log.png";
 import { Link, useNavigate } from "react-router-dom";
-import { apiLogin } from "./services/auth";
+import { apiLogin} from "./services/auth";
 import { toast, ToastContainer } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css'
 
@@ -34,6 +34,8 @@ const Login: React.FC = () => {
   };
 
   return (
+
+
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <div className="flex flex-col md:flex-row w-full max-w-4xl bg-white shadow-lg rounded-lg">
         <div className="w-full md:w-1/2 p-8 space-y-6">
