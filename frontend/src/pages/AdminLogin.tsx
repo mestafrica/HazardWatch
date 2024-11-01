@@ -16,20 +16,19 @@ const AdminLogin: React.FC = () => {
 
       // Ensure email and password are present
       if (!email || !password) {
-        console.error("Email and password are required.");
+        alert(`Email and password are required.`);
         return;
       }
 
       const response = await apiAdminLogin({ email, password });
 
-      console.log(response.data);
       // Navigate only after successful login
       navigate("/admin-dashboard");
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        console.error("API error:", error.response?.data);
+        alert(`API error: ${error.response?.data}`);
       } else {
-        console.error("Unexpected error:", error);
+        alert(`Unexpected error: ${error}`);
       }
     }
   };
