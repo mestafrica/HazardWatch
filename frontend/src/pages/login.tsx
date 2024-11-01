@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import logImage from "../assets/images/log.png";
 import { Link, useNavigate } from "react-router-dom";
-import { apiLogin} from "./services/auth";
+import { apiLogin } from "./services/auth";
 import { toast, ToastContainer } from "react-toastify";
-import 'react-toastify/dist/ReactToastify.css'
+import "react-toastify/dist/ReactToastify.css";
 
 const Login: React.FC = () => {
   const [usernameOrEmail, setUsernameOrEmail] = useState<string>("");
@@ -11,31 +11,30 @@ const Login: React.FC = () => {
 
   const navigate = useNavigate();
 
-  const handleSubmit = async (event: { preventDefault: () => void; target: HTMLFormElement | undefined; }) => {
+  const handleSubmit = async (event: {
+    preventDefault: () => void;
+    target: HTMLFormElement | undefined;
+  }) => {
     event.preventDefault();
     const formData = new FormData(event.target);
-    const usernameOrEmail = formData.get ("Username/Email")
-    const password = formData.get("password")
-    const response = await apiLogin({usernameOrEmail,password})
+    const usernameOrEmail = formData.get("Username/Email");
+    const password = formData.get("password");
+    const response = await apiLogin({ usernameOrEmail, password });
 
-    if (response.status===200){
-      localStorage.setItem("token",response.data.accessToken)
+    if (response.status === 200) {
+      localStorage.setItem("token", response.data.accessToken);
     }
 
-    
-    if (response.status===200) {
+    if (response.status === 200) {
       localStorage.setItem("token", response.data.accessToken);
       toast.success("Login Successful");
       navigate("/dashboard");
     } else {
-      toast.error("Invalid email or password")
+      toast.error("Invalid email or password");
     }
-    
   };
 
   return (
-
-
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <div className="flex flex-col md:flex-row w-full max-w-4xl bg-white shadow-lg rounded-lg">
         <div className="w-full md:w-1/2 p-8 space-y-6">
@@ -113,7 +112,7 @@ const Login: React.FC = () => {
           />
         </div>
       </div>
-      <ToastContainer/>
+      <ToastContainer />
     </div>
   );
 };

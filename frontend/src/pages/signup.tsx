@@ -10,47 +10,36 @@ const SignUp: React.FC = () => {
   const [confirmPassword, setConfirmPassword] = useState<string>("");
   const [firstName, setFirstName] = useState<string>("");
   const [lastName, setLastName] = useState<string>("");
-  const [loading, setLoading] = useState(false)
-  const navigate = useNavigate()
-
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    // try {
-    //   setLoading(true)
-    //   const formData = new FormData(event.target)
-    //   const firstName = formData.get("firstName")
-    //   const lastName = formData.get("lastName")
-    //   const email = formData.get("email")
-    //   const password = formData.get("password")
-    //   const confirmPassword = formData.get("confirmPassword")
 
-    //   console.log(firstName,lastName,email,password,confirmPassword);
+    if (password !== confirmPassword) {
+      toast.error("Passwords do not match!");
+      return;
+    }
+    try {
+      setLoading(true);
+      const payload = {
+        firstName: firstName,
+        lastName: lastName,
+        email: email,
+        password: password,
+      };
+      const response = await apiSignup(payload);
+      console.log(response.data);
+      toast.success("Sign up Successful");
+      navigate("/login");
+    } catch (error) {
+      toast.error("Signup failed. Please try again.");
 
-      if (password !== confirmPassword) {
-        toast.error("Passwords do not match!")
-        return;
-      }
-      try {
-        setLoading(true);
-      const payload = {firstName:firstName, lastName:lastName, email:email, password:password}
-      const response = await apiSignup (payload)
-      console.log(response.data)
-      toast.success("Sign up Successful")
-      navigate("/login")
-
-    }catch (error) {
-        toast.error("Signup failed. Please try again.")
-
-        console.log(error)
-
-      } finally {
-          setLoading(false)
-        
-      }
-    
-  
-  }
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
@@ -72,7 +61,7 @@ const SignUp: React.FC = () => {
                 type="text"
                 name="firstName"
                 value={firstName}
-                onChange={(e)=> setFirstName(e.target.value)}
+                onChange={(e) => setFirstName(e.target.value)}
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                 placeholder="Enter your first name"
                 required
@@ -85,7 +74,7 @@ const SignUp: React.FC = () => {
               <input
                 type="text"
                 name="lastName"
-                onChange={(e)=> setLastName(e.target.value)}
+                onChange={(e) => setLastName(e.target.value)}
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                 placeholder="Enter your last name"
                 required
@@ -146,7 +135,6 @@ const SignUp: React.FC = () => {
               className="w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-base font-medium text-black bg-[#E6FCF9] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
             >
               {loading ? "Signing Up..." : "Sign Up"}
-         
             </button>
             <div className="text-center">
               <Link
@@ -167,7 +155,7 @@ const SignUp: React.FC = () => {
           />
         </div>
       </div>
-      <ToastContainer/>
+      <ToastContainer />
     </div>
   );
 };
