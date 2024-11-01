@@ -197,6 +197,16 @@ const deleteUser = async (req: Request, res: Response, next: NextFunction) => {
     }
 };
 
+// get all reports function
+const getAllReports = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const reports = await Report; 
+        res.status(200).json({ reports, count: reports.length });
+    } catch (error) {
+        next(error);
+    }
+};
+
 
 
 // Logout function
@@ -242,4 +252,4 @@ const getAllUsers = (req: Request, res: Response, next: NextFunction) => {
 // Function for an admin to create a user
 
 
-export default { register, login, createUser, logout, editUser, deleteUser, getAllUsers };
+export default { register, login, createUser, logout, editUser, deleteUser, getAllUsers,getAllReports };
