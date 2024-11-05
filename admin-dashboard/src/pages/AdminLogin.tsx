@@ -2,7 +2,7 @@ import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import padlock from "../assets/images/forms/padlock.jpg";
 import { apiAdminLogin } from "../services/auth";
-import axios from "axios"; // Ensure you import axios for error checking
+import axios from "axios"; // importing axios for error checking
 
 const AdminLogin: React.FC = () => {
   const navigate = useNavigate();
@@ -14,7 +14,7 @@ const AdminLogin: React.FC = () => {
       const email = formData.get("email") as string | null;
       const password = formData.get("password") as string | null;
 
-      // Ensure email and password are present
+      // Ensuring email and password are present
       if (!email || !password) {
         alert(`Email and password are required.`);
         return;
