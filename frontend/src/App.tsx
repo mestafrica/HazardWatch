@@ -4,7 +4,7 @@ import SignUp from "./pages/signup";
 import PasswordRecovery from "./pages/passwordRecovery";
 import MapPage from "./pages/mapPage";
 import DashboardPage from "./pages/dashboard";
-import AdminLogin from "./pages/AdminLogin";
+import AdminLogin from "../../admin-dashboard/src/pages/AdminLogin";
 
 export default function App() {
   return (
@@ -12,7 +12,6 @@ export default function App() {
       <div className="App">
         <Routes>
           <Route path="/login" element={<Login />} />
-          <Route path="/admin-login" element={<AdminLogin />} />
           <Route path="/signup" element={<SignUp />} />
           <Route path="/password-recovery" element={<PasswordRecovery />} />
           <Route path="/" element={<Login />} />

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import logImage from "../assets/images/log.png";
 import { Link, useNavigate } from "react-router-dom";
-import { apiAdminLogi } from "../services/auth";
+import { apiAdminLogi } from "../../../admin-dashboard/src/services/auth";
 
 const Login: React.FC = () => {
   const [usernameOrEmail, setUsernameOrEmail] = useState<string>("");
