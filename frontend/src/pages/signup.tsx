@@ -10,6 +10,7 @@ const SignUp: React.FC = () => {
   const [confirmPassword, setConfirmPassword] = useState<string>("");
   const [firstName, setFirstName] = useState<string>("");
   const [lastName, setLastName] = useState<string>("");
+  const [userName, setUserName] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -27,7 +28,10 @@ const SignUp: React.FC = () => {
         lastName: lastName,
         email: email,
         password: password,
+        confirmPassword: confirmPassword,
+       userName: userName,
       };
+      console.log("Payload:", payload);
       const response = await apiSignup(payload);
       console.log(response.data);
       toast.success("Sign up Successful");
@@ -40,6 +44,8 @@ const SignUp: React.FC = () => {
       setLoading(false);
     }
   };
+
+
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
@@ -95,6 +101,24 @@ const SignUp: React.FC = () => {
                 onChange={(e) => setEmail(e.target.value)}
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                 placeholder="Enter your email"
+                required
+              />
+            </div>
+            <div>
+              <label
+                htmlFor="UserName"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Username
+              </label>
+              <input
+                id="UserName"
+                type="text"
+                name="userName"
+                value={userName}
+                onChange={(e) => setUserName(e.target.value)}
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                placeholder="Enter your username"
                 required
               />
             </div>
