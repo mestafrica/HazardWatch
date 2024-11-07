@@ -39,6 +39,11 @@ const register = async (req: Request, res: Response, next: NextFunction) => {
         return res.status(400).json({ message: 'Passwords do not match' });
     }
     try {
+        // check if user does not exist
+        const userEmail = await User.findOne({email: value.email});
+        if (userEmail) {
+            return res.status(409).json('User already exists!');
+        }
         // Hash the password
         const hash = await bcryptjs.hashSync(password, 10);
 
