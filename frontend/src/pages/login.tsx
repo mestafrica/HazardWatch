@@ -3,7 +3,8 @@ import logImage from "../assets/images/log.png";
 import { Link, useNavigate } from "react-router-dom";
 import { apiLogin } from "./services/auth";
 import { toast, ToastContainer } from "react-toastify";
-import 'react-toastify/dist/ReactToastify.css'
+import 'react-toastify/dist/ReactToastify.css';
+import { apiAdminLogi } from "../../../admin-dashboard/src/services/auth";
 
 const Login: React.FC = () => {
   const [usernameOrEmail, setUsernameOrEmail] = useState<string>("");
@@ -21,8 +22,6 @@ const Login: React.FC = () => {
     if (response.status===200){
       localStorage.setItem("token",response.data.accessToken)
     }
-
-    
     if (response.status===200) {
       localStorage.setItem("token", response.data.accessToken);
       toast.success("Login Successful");
@@ -30,7 +29,7 @@ const Login: React.FC = () => {
     } else {
       toast.error("Invalid email or password")
     }
-    
+    navigate("/dashboard");
   };
 
   return (
