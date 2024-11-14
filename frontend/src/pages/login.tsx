@@ -1,6 +1,9 @@
 import React, { useState } from "react";
 import logImage from "../assets/images/log.png";
 import { Link, useNavigate } from "react-router-dom";
+import { apiLogin } from "./services/auth";
+import { toast, ToastContainer } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
 import { apiAdminLogi } from "../../../admin-dashboard/src/services/auth";
 
 const Login: React.FC = () => {
@@ -9,11 +12,23 @@ const Login: React.FC = () => {
 
   const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async (event: { preventDefault: () => void; target: HTMLFormElement | undefined; }) => {
+    event.preventDefault();
+    const formData = new FormData(event.target);
+    const usernameOrEmail = formData.get ("Username/Email")
+    const password = formData.get("password")
+    const response = await apiLogin({usernameOrEmail,password})
 
-    console.log("Username/Email:", usernameOrEmail);
-    console.log("Password:", password);
+    if (response.status===200){
+      localStorage.setItem("token",response.data.accessToken)
+    }
+    if (response.status===200) {
+      localStorage.setItem("token", response.data.accessToken);
+      toast.success("Login Successful");
+      navigate("/dashboard");
+    } else {
+      toast.error("Invalid email or password")
+    }
     navigate("/dashboard");
   };
 
@@ -95,6 +110,7 @@ const Login: React.FC = () => {
           />
         </div>
       </div>
+      <ToastContainer/>
     </div>
   );
 };
