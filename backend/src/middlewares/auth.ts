@@ -28,6 +28,7 @@ const checkAuth = (req: Request, res: Response, next: NextFunction): Response | 
                 next();
             }
         });
+
     } else {
         console.error('No token provided');
         return res.status(401).json({
@@ -59,9 +60,9 @@ const hasPermission = (permission: string) => {
             // console.log('User role:', userRole);
             // Use role to check if the user has permission
             if (userRole && userRole.permissions.includes(permission)) {
-               return next();
+                return next();
             } else {
-               return res.status(403).json('Not authorized!');
+                return res.status(403).json('Not authorized!');
             }
         } catch (error) {
             next(error);
@@ -69,4 +70,4 @@ const hasPermission = (permission: string) => {
     }
 }
 
-export { checkAuth, hasPermission }
+export { checkAuth, hasPermission } 

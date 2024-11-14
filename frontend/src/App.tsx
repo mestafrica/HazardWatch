@@ -4,6 +4,7 @@ import SignUp from "./pages/signup";
 import PasswordRecovery from "./pages/passwordRecovery";
 import MapPage from "./pages/mapPage";
 import DashboardPage from "./pages/dashboard";
+import AdminLogin from "../../admin-dashboard/src/pages/AdminLogin";
 
 export default function App() {
   return (

@@ -11,4 +11,3 @@ if  (token)  {
 export const apiClient = axios.create({
     baseURL: baseUrl,
 });
-

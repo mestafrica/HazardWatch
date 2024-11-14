@@ -3,7 +3,8 @@ import logImage from "../assets/images/log.png";
 import { Link, useNavigate } from "react-router-dom";
 import { apiLogin } from "./services/auth";
 import { toast, ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import 'react-toastify/dist/ReactToastify.css';
+import { apiAdminLogi } from "../../../admin-dashboard/src/services/auth";
 
 const Login: React.FC = () => {
   const [userName, setUserName] = useState<string>("");
@@ -21,19 +22,15 @@ const Login: React.FC = () => {
       const response = await apiLogin({ userName, password });
 
     if (response.status === 200) {
-      console.log("Login successfull:", response.data)
       localStorage.setItem("token", response.data.accessToken);
       toast.success("Login Successful");
       navigate("/dashboard");
-    } else {
-      toast.error("Invalid email or password");
-    }
+    } 
   } catch (error) {
-    console.error("Login error:", error);
-
     toast.error("Error logging in. Please check your credentials.");
-
   }
+
+    navigate("/dashboard");
   };
 
   return (
