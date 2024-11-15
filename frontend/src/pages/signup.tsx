@@ -1,16 +1,51 @@
 import React, { useState } from "react";
 import { assets } from "../assets";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { toast, ToastContainer } from "react-toastify";
+import { apiSignup } from "../services/auth";
 
 const SignUp: React.FC = () => {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
+  const [confirmPassword, setConfirmPassword] = useState<string>("");
+  const [firstName, setFirstName] = useState<string>("");
+  const [lastName, setLastName] = useState<string>("");
+  const [userName, setUserName] = useState<string>("");
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log("Email:", email);
-    console.log("Password:", password);
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    if (password !== confirmPassword) {
+      toast.error("Passwords do not match!");
+      return;
+    }
+    try {
+      setLoading(true);
+      const payload = {
+        firstName: firstName,
+        lastName: lastName,
+        email: email,
+        password: password,
+        confirmPassword: confirmPassword,
+       userName: userName,
+      };
+      console.log("Payload:", payload);
+      const response = await apiSignup(payload);
+      console.log(response.data);
+      toast.success("Sign up Successful");
+      navigate("/login");
+    } catch (error) {
+      toast.error("Signup failed. Please try again.");
+
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
   };
+
+
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
@@ -30,6 +65,9 @@ const SignUp: React.FC = () => {
               </label>
               <input
                 type="text"
+                name="firstName"
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                 placeholder="Enter your first name"
                 required
@@ -41,6 +79,8 @@ const SignUp: React.FC = () => {
               </label>
               <input
                 type="text"
+                name="lastName"
+                onChange={(e) => setLastName(e.target.value)}
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                 placeholder="Enter your last name"
                 required
@@ -56,10 +96,29 @@ const SignUp: React.FC = () => {
               <input
                 id="Email"
                 type="email"
+                name="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                 placeholder="Enter your email"
+                required
+              />
+            </div>
+            <div>
+              <label
+                htmlFor="UserName"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Username
+              </label>
+              <input
+                id="UserName"
+                type="text"
+                name="userName"
+                value={userName}
+                onChange={(e) => setUserName(e.target.value)}
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                placeholder="Enter your username"
                 required
               />
             </div>
@@ -73,6 +132,7 @@ const SignUp: React.FC = () => {
               <input
                 id="password"
                 type="password"
+                name="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
@@ -85,7 +145,10 @@ const SignUp: React.FC = () => {
                 Confirm Password
               </label>
               <input
-                type="text"
+                type="password"
+                name="confirmPassword"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                 placeholder="Confirm your password"
                 required
@@ -95,7 +158,7 @@ const SignUp: React.FC = () => {
               type="submit"
               className="w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-base font-medium text-black bg-[#E6FCF9] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
             >
-              Sign Up
+              {loading ? "Signing Up..." : "Sign Up"}
             </button>
             <div className="text-center">
               <Link
@@ -116,6 +179,7 @@ const SignUp: React.FC = () => {
           />
         </div>
       </div>
+      <ToastContainer />
     </div>
   );
 };
