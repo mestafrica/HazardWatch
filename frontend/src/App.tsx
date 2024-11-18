@@ -4,6 +4,7 @@ import SignUp from "./pages/signup";
 import PasswordRecovery from "./pages/passwordRecovery";
 import MapPage from "./pages/mapPage";
 import DashboardPage from "./pages/dashboard";
+import CoordinatesAndLocation from "./components/CoordinatesAndLocation";
 
 
 export default function App() {
@@ -17,6 +18,10 @@ export default function App() {
           <Route path="/" element={<Login />} />
           <Route path="/map" element={<MapPage />} />
           <Route path="/dashboard" element={<DashboardPage />} />
+          <Route
+            path="/co-ordinates-location"
+            element={<CoordinatesAndLocation />}
+          />
         </Routes>
       </div>
     </Router>
