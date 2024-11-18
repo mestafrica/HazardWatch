@@ -11,16 +11,16 @@ const AdminLogin: React.FC = () => {
     try {
       e.preventDefault();
       const formData = new FormData(e.currentTarget);
-      const email = formData.get("email") as string | null;
+      const userName = formData.get("userName") as string | null;
       const password = formData.get("password") as string | null;
 
       // Ensuring email and password are present
-      if (!email || !password) {
+      if (!userName || !password) {
         alert(`Email and password are required.`);
         return;
       }
 
-      const response = await apiAdminLogin({ email, password });
+      const response = await apiAdminLogin({ userName, password });
 
       // Navigate only after successful login
       navigate("/admin-dashboard");
@@ -46,15 +46,15 @@ const AdminLogin: React.FC = () => {
           <form onSubmit={saveLogin} className="space-y-6">
             <div>
               <label
-                htmlFor="email"
+                htmlFor="userName"
                 className="block text-sm font-medium text-gray-700"
               >
-                Email
+                Username
               </label>
               <input
-                id="email"
+                id="userName"
                 type="text"
-                name="email"
+                name="userName"
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                 placeholder="Enter your email"
                 required
