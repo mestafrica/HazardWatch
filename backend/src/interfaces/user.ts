@@ -14,3 +14,12 @@ export default interface IUser extends Document{
     createResetPasswordToken: string;
     
 }
+// define report interface
+
+ export default interface IReport extends Document{
+    userId: Types.ObjectId;
+    reportType:String;
+    description:String;
+    status:String;
+    createdAt:Date;
+}

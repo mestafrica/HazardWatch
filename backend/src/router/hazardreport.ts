@@ -3,8 +3,9 @@ import controller from '../controllers/hazardreport';
 import { extractJWT, checkAdmin } from '../middlewares/extractJWT';
 import upload from '../middlewares/upload';
 
-  
 const router = express.Router();
+
+
 
 router.post('/create', extractJWT, upload.array('images', 10), controller.createHazardReport);
 
@@ -14,5 +15,7 @@ router.delete('/delete/:id', extractJWT, checkAdmin, controller.deleteHazardRepo
 
 router.get('/getall', controller.getAllHazardReports);
 router.get('/getid/:id', controller.getHazardReportById);
+
+
 
 export = router;
