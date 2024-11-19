@@ -5,7 +5,7 @@ import {
   forgotPasswordValidator,
   loginValidator,
   resetPasswordValidator,
-} from "../schema/user";
+} from "../validators/user";
 import * as jwt from "jsonwebtoken";
 import { ResetTokenModel } from "../models/token";
 import { mailTransport } from "../utils/sendEmail";
