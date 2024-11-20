@@ -20,9 +20,10 @@ const Login: React.FC = () => {
 
     try {
       const response = await apiLogin({ userName, password });
+  
 
     if (response.status === 200) {
-      localStorage.setItem("token", response.data.accessToken);
+      localStorage.setItem("token", response.data.token);
       toast.success("Login Successful");
       navigate("/dashboard");
     } 
@@ -30,7 +31,7 @@ const Login: React.FC = () => {
     toast.error("Error logging in. Please check your credentials.");
   }
 
-    navigate("/dashboard");
+    navigate("/dashboard/home");
   };
 
   return (

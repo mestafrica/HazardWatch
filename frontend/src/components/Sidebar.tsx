@@ -8,7 +8,7 @@ import LogOutIcon from "../assets/images/logOutIcon.png";
 
 const Sidebar: React.FC = () => {
   return (
-    <aside className="w-[239px] bg-[#FFFFFF] h-[1259px] text-xs p-4">
+    <aside className="w-[239px] bg-[#FFFFFF] h-screen text-sm p-4">
       <nav className="space-y-4">
         
         <h1 className="w-[109px] h-[43px] pt-[8px] ml-[24px] mt-[20px]">
@@ -46,7 +46,7 @@ const Sidebar: React.FC = () => {
         </div>
 
         <Link
-          to="map"
+          to="/dashboard/map"
           className="text-gray-700 flex items-center w-[191px] h-[35px] pt-[8px] hover:bg-[#E8E8EA] active:bg-[#E8E8EA] focus:outline-none focus:ring focus:ring-[#E8E8EA] rounded-[4px] gap-[8px]"
         >
           <img src={mapIconIcon} alt="Map Icon" className="w-[16px] h-[16px]" />
