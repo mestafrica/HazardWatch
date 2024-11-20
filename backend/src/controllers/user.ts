@@ -86,14 +86,14 @@ const login = async (req: Request, res: Response, next: NextFunction) => {
             .exec();
                 if (!user) {
                     return res.status(401).json({
-                        message: 'Unauthorized'
+                        message: 'Username not found'
                     });
                 }
     
-                const isMatch = bcryptjs.compare(password, user.password)
+                const isMatch = bcryptjs.compareSync(value.password, user.password)
                     if (!isMatch) {
                         return res.status(401).json({
-                            message: 'Password Mismatch'
+                            message: 'Password is incorrect'
                         });
                     }
                     // Sign JWT using the signJWT function
