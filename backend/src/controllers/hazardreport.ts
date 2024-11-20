@@ -2,14 +2,14 @@ import { NextFunction, Request, Response } from 'express';
 import mongoose, { Types } from 'mongoose';
 import HazardReport from '../models/hazardreport';
 import User from '../models/user';
-import { hazardreportSchema } from '../schema/hazardreport';
+import { hazardreportValidator } from '../validators/hazardreport';
 import { IHazardReport } from '../interfaces/hazardreport';
 
 const NAMESPACE = 'HazardReport';
 
 const createHazardReport = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const { error, value } = hazardreportSchema.validate({
+        const { error, value } = hazardreportValidator.validate({
             ...req.body,
             images: (req.files as Express.Multer.File[] | undefined)?.map(file => file.filename) || []
         });
@@ -30,7 +30,7 @@ const createHazardReport = async (req: Request, res: Response, next: NextFunctio
         }
 
         // Create hazard report with explicit type
-        const hazardReport = await HazardReport.create(value) as IHazardReport & { _id: Types.ObjectId };
+        const hazardReport = await HazardReport.create({...value, user}) as IHazardReport & { _id: Types.ObjectId };
 
         // Add the new hazard report's ID to the user's reports array
         user.reports.push(hazardReport._id);
@@ -47,7 +47,7 @@ const createHazardReport = async (req: Request, res: Response, next: NextFunctio
 const getAllHazardReports = async (req: Request, res: Response, next: NextFunction) => {
     try {
         // If you're validating query parameters, use req.query instead of req.body
-        const { error, value } = hazardreportSchema.validate(req.query);  // Adjust validation for query parameters
+        const { error, value } = hazardreportValidator.validate(req.query);  // Adjust validation for query parameters
         if (error) {
             console.error('Validation Error:', error.details[0].message);
             return res.status(400).json({ message: error.details[0].message });
@@ -104,7 +104,7 @@ const updateHazardReport = async (req: Request, res: Response, next: NextFunctio
 
     try {
         // Validate the data to update a hazard report
-        const { error, value } = hazardreportSchema.validate(req.body);
+        const { error, value } = hazardreportValidator.validate(req.body);
         if (error) {
             console.error('Validation Error:', error.details[0].message);
             return res.status(400).json({ message: error.details[0].message });
