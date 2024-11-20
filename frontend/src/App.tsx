@@ -4,12 +4,14 @@ import SignUp from "./pages/signup";
 import PasswordRecovery from "./pages/passwordRecovery";
 import MapPage from "./pages/mapPage";
 import DashboardPage from "./pages/dashboard";
+import HazardReport from "./components/HazardReport"
 
 export default function App() {
   return (
     <Router>
       <div className="App">
         <Routes>
+          <Route path="/hazardreport" element={<HazardReport/>} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<SignUp />} />
           <Route path="/password-recovery" element={<PasswordRecovery />} />
