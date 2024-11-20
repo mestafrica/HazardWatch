@@ -13,7 +13,7 @@ router.patch('/users/:id', checkAuth, hasPermission('update_user'), controller.e
 router.delete('/users/:id', checkAuth, hasPermission('delete_user'), controller.deleteUser);
 router.post('/users/logout', checkAuth, controller.logout);
 router.get('/users', checkAuth, hasPermission('read_users'), controller.getAllUsers);
-
+router.get('/admin/reports',checkAuth,hasPermission('view_reports'),controller.getAllReports);
 
 
 // Export router

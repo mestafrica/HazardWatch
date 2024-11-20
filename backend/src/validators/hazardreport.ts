@@ -1,6 +1,6 @@
 import Joi from "joi";
 
-export const hazardreportSchema = Joi.object({
+export const hazardreportValidator = Joi.object({
     title: Joi.string().required(),
     hazardtype: Joi.string().required(),
     description: Joi.string().required(),

@@ -9,6 +9,22 @@ import mongoose, { Schema, Types } from "mongoose";
 
 const bcryptSalt = process.env.BCRYPT_SALT;
 
+// define  report schema
+const ReportSchema: Schema = new Schema({
+    userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+    reportType: {
+        type: String, required: true, enum: ['bug', 'feedback', 'other']
+
+    },
+
+    description: { type: String, required: true },
+    status: {
+        type: String, enum: ['open', 'in progress', 'resolved'], default:
+            'open'
+    },
+    createdAt: { type: Date, default: Date.now }
+});
+
 
 const UserSchema: Schema = new Schema({
     firstName: { type: String, required: true },
@@ -19,10 +35,10 @@ const UserSchema: Schema = new Schema({
     confirmPassword: { type: String, required: true },
     role: { type: String, default: 'user', enum: ['admin', 'user'] },
     reports: [{ type: Types.ObjectId, ref: 'Reports' }],
-    createResetPasswordToken: {type: String},
-    passwordChangedAt: {type: Date},
-    passwordResetToken:{type: String},
-    passwordResetTokenExpires:{type: Date}
+    createResetPasswordToken: { type: String },
+    passwordChangedAt: { type: Date },
+    passwordResetToken: { type: String },
+    passwordResetTokenExpires: { type: Date }
 },
     {
         timestamps: true
@@ -41,8 +57,7 @@ const UserSchema: Schema = new Schema({
 
 
 // Export Models
-export default mongoose.model<IUser>('User', UserSchema)
-
+export default mongoose.model<IUser>('User', UserSchema);
 
 
 

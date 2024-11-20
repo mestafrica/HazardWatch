@@ -7,7 +7,7 @@ import jwt from 'jsonwebtoken';
 import config from 'config/config';
 import signJWT from '../functions/signJWT';
 import bcrypt from "bcrypt";
-import { createUserValidator, forgotPasswordValidator, loginValidator, registerValidator, updateUserValidator } from '../schema/user';
+import { createUserValidator, forgotPasswordValidator, loginValidator, registerValidator, updateUserValidator } from '../validators/user';
 
 const NAMESPACE = 'User';
 
@@ -39,6 +39,11 @@ const register = async (req: Request, res: Response, next: NextFunction) => {
         return res.status(400).json({ message: 'Passwords do not match' });
     }
     try {
+        // check if user does not exist
+        const userEmail = await User.findOne({email: value.email});
+        if (userEmail) {
+            return res.status(409).json({ message:'Email already exists!'});
+        }
         // Hash the password
         const hash = await bcryptjs.hashSync(password, 10);
 
@@ -81,14 +86,14 @@ const login = async (req: Request, res: Response, next: NextFunction) => {
             .exec();
                 if (!user) {
                     return res.status(401).json({
-                        message: 'Unauthorized'
+                        message: 'Username not found'
                     });
                 }
     
-                const isMatch = bcryptjs.compare(password, user.password)
+                const isMatch = bcryptjs.compareSync(value.password, user.password)
                     if (!isMatch) {
                         return res.status(401).json({
-                            message: 'Password Mismatch'
+                            message: 'Password is incorrect'
                         });
                     }
                     // Sign JWT using the signJWT function
@@ -197,6 +202,16 @@ const deleteUser = async (req: Request, res: Response, next: NextFunction) => {
     }
 };
 
+// get all reports function
+const getAllReports = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const reports = await Report; 
+        res.status(200).json({ reports, count: reports.length });
+    } catch (error) {
+        next(error);
+    }
+};
+
 
 
 // Logout function
@@ -242,4 +257,4 @@ const getAllUsers = (req: Request, res: Response, next: NextFunction) => {
 // Function for an admin to create a user
 
 
-export default { register, login, createUser, logout, editUser, deleteUser, getAllUsers };
+export default { register, login, createUser, logout, editUser, deleteUser, getAllUsers,getAllReports };
