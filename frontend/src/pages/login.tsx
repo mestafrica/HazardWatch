@@ -7,28 +7,29 @@ import 'react-toastify/dist/ReactToastify.css';
 import { apiAdminLogi } from "../../../admin-dashboard/src/services/auth";
 
 const Login: React.FC = () => {
-  const [usernameOrEmail, setUsernameOrEmail] = useState<string>("");
+  const [userName, setUserName] = useState<string>("");
   const [password, setPassword] = useState<string>("");
 
   const navigate = useNavigate();
 
-  const handleSubmit = async (event: { preventDefault: () => void; target: HTMLFormElement | undefined; }) => {
-    event.preventDefault();
-    const formData = new FormData(event.target);
-    const usernameOrEmail = formData.get ("Username/Email")
-    const password = formData.get("password")
-    const response = await apiLogin({usernameOrEmail,password})
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+   event.preventDefault()
+    const formData = new FormData(event.currentTarget);
+    const userName = formData.get("userName") as string;
+    const password = formData.get("password") as string;
 
-    if (response.status===200){
-      localStorage.setItem("token",response.data.accessToken)
-    }
-    if (response.status===200) {
+    try {
+      const response = await apiLogin({ userName, password });
+
+    if (response.status === 200) {
       localStorage.setItem("token", response.data.accessToken);
       toast.success("Login Successful");
       navigate("/dashboard");
-    } else {
-      toast.error("Invalid email or password")
-    }
+    } 
+  } catch (error) {
+    toast.error("Error logging in. Please check your credentials.");
+  }
+
     navigate("/dashboard");
   };
 
@@ -51,18 +52,20 @@ const Login: React.FC = () => {
                 htmlFor="Email"
                 className="block text-sm font-medium text-gray-700"
               >
-                Email
+                Username
               </label>
               <input
-                id="Email"
+                id="userName"
                 type="text"
-                value={usernameOrEmail}
-                onChange={(e) => setUsernameOrEmail(e.target.value)}
+                name="userName"
+                value={userName}
+                onChange={(e) => setUserName(e.target.value)}
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                placeholder="Enter your username or email"
+                placeholder="Enter your username"
                 required
               />
             </div>
+            
             <div>
               <label
                 htmlFor="password"
@@ -73,6 +76,7 @@ const Login: React.FC = () => {
               <input
                 id="password"
                 type="password"
+                name="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
@@ -110,7 +114,7 @@ const Login: React.FC = () => {
           />
         </div>
       </div>
-      <ToastContainer/>
+      <ToastContainer />
     </div>
   );
 };

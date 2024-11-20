@@ -42,4 +42,4 @@ const checkAdmin = (req: Request, res: Response, next: NextFunction) => {
     }
 };
 
-export { extractJWT, checkAdmin };
+export { extractJWT, checkAdmin }; 

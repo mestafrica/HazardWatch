@@ -12,5 +12,5 @@ export const apiClient = axios.create({
     baseURL: baseUrl,
 });
 
-
 export const mapApiKey = import.meta.env.VITE_GOOGLE_API_KEY
+
