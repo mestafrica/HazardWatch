@@ -135,6 +135,40 @@ const updateHazardReport = async (req: Request, res: Response, next: NextFunctio
 };
 
 
+
+const getUserHazardCount = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const jwtId = res.locals.jwt?.id; // Extract user ID from the JWT
+
+        // Check if the user ID exists in the JWT
+        if (!jwtId) {
+            return res.status(401).json({ message: "Unauthorized: User ID is missing in JWT" });
+        }
+
+        // Validate that the user ID is a valid MongoDB ObjectId
+        if (!mongoose.isValidObjectId(jwtId)) {
+            return res.status(400).json({ message: "Invalid User ID format" });
+        }
+
+        // Convert the user ID to a MongoDB ObjectId
+        const userId = new mongoose.Types.ObjectId(jwtId);
+
+        // Fetch the hazard reports associated with the user
+        const hazardReports = await HazardReport.find({ user: userId }).exec();
+        console.log("Hazard Reports Retrieved:", hazardReports);
+
+        return res.status(200).json({
+            message: "User Hazard Reports retrieved successfully",
+            hazardReports,
+            count: hazardReports.length,
+        });
+    } catch (error) {
+        console.error("Error fetching user hazard reports:", error);
+        next(error);
+    }
+};
+
+
 const deleteHazardReport = async (req: Request, res: Response, next: NextFunction) => {
     const hazardReportId = req.params.id;
 
@@ -162,4 +196,4 @@ const deleteHazardReport = async (req: Request, res: Response, next: NextFunctio
     }
 };
 
-export default { createHazardReport, updateHazardReport, getHazardReportById, getAllHazardReports, deleteHazardReport };
+export default { createHazardReport, updateHazardReport, getHazardReportById, getAllHazardReports, getUserHazardCount, deleteHazardReport };

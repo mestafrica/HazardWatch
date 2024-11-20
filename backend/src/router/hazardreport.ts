@@ -9,6 +9,7 @@ const router = express.Router();
 
 router.post('/create', extractJWT, upload.array('images', 10), controller.createHazardReport);
 
+router.get('/user-reports', extractJWT, controller.getUserHazardCount);
 
 router.patch('/update/:id', extractJWT, checkAdmin, controller.updateHazardReport);
 router.delete('/delete/:id', extractJWT, checkAdmin, controller.deleteHazardReport);
