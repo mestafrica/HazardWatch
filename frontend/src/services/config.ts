@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios from "axios";
 
 export const baseUrl = import.meta.env.VITE_BASE_URL;
 
@@ -9,5 +9,7 @@ if (token) {
 }
 
 export const apiClient = axios.create({
-    baseURL: baseUrl,
+  baseURL: baseUrl,
 });
+
+export const mapApiKey = import.meta.env.VITE_GOOGLE_API_KEY;
