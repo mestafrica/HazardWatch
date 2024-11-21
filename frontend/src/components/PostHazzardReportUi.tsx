@@ -12,22 +12,37 @@ import {
   DialogPanel,
   DialogTitle,
 } from "@headlessui/react";
+import Swal from "sweetalert2";
 
 const PostHazzardReportUi: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   console.log(isOpen);
 
-  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault(); // Prevent page reload
-    const formData = new FormData(event.target);
-    const response = await apiPostHazzardReport(payload);
-    console.log("Form submitted");
+  const handleSubmit = async (
+    event: FormEvent<HTMLFormElement>
+  ): Promise<void> => {
+    try {
+      event.preventDefault(); // Prevent page reload
+      const formData = new FormData(event.currentTarget);
+      await apiPostHazzardReport(formData);
+    } catch (error) {
+      Swal.fire({
+        title: "Oops!... Post failed",
+        text: "Something went wrong. Please try again.",
+        icon: "error",
+        confirmButtonText: "OK",
+      });
+    }
   };
+
+
+
+   
 
   return (
     <section
       id="post-hazzard"
-      className="w-[45vw] h-[15vh] bg-[#dddddd] mx-auto"
+      className="lg:w-[45vw] md:w-[45vw] w-[100vw] lg:h-[16vh] flex-grow bg-[#dddddd] mx-auto"
     >
       <div
         id="alignment-container"
@@ -35,7 +50,7 @@ const PostHazzardReportUi: React.FC = () => {
       >
         <div
           id="avatar-side"
-          className="w-[7%] h-[100%] flex items-start justify-end"
+          className="lg:w-[7%] h-[100%] flex items-start justify-end"
         >
           <div className="w-[50px] h-[50px] rounded-[50px] overflow-hidden">
             <img
@@ -48,19 +63,20 @@ const PostHazzardReportUi: React.FC = () => {
         <form
           onSubmit={handleSubmit}
           id="post-side"
-          className="w-[91%] h-[100%] flex flex-col justify-between"
+          className="w-[91%] h-[100%] flex flex-col gap-y-[1rem] justify-between"
         >
-          <div id="post-side-top" className="h-[47%] w-[100%]">
+          <div id="post-side-top" className="h-[47%] w-[100%] ">
             <input
               type="text"
-              className="h-[100%] w-[100%] text-[1.2rem] px-[25px] rounded-[50px] bg-[#F2F2F2]"
+              className="lg:h-[100%] h-auto w-[100%] text-[1.2rem] px-[25px] rounded-[50px] bg-[#F2F2F2]"
               placeholder="Type here"
+              multiple
               onFocus={() => setIsOpen(true)}
             />
           </div>
           <div
             id="post-side-bottom"
-            className="h-[47%] w-[100%] flex items-center justify-between"
+            className="h-[47%] w-[100%] flex lg:flex-row items-center lg:justify-between md:justify-between flex-col gap-y-[1rem]"
           >
             <div id="icons" className="flex gap-x-[1.5rem]">
               <img
@@ -135,7 +151,7 @@ const PostHazzardReportUi: React.FC = () => {
                       </option>
                     </select>
                   </div>
-                  <div className="h-[100%] flex lg:flex-row md:flex-col flex-col md:gap-y-[1.5rem] gap-y-[1.5rem] items-end justify-between">
+                  <div className="h-[100%] flex lg:flex-row md:flex-col flex-col md:gap-y-[1.5rem] gap-y-[1.5`rem] items-end justify-between">
                     <div
                       id="description-field"
                       className="lg:w-[59%] md:w-[100%] w-[100%] flex flex-col gap-y-[0.5rem]"
