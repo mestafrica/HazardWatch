@@ -2,14 +2,14 @@ import { NextFunction, Request, Response } from 'express';
 import mongoose, { Types } from 'mongoose';
 import HazardReport from '../models/hazardreport';
 import User from '../models/user';
-import { hazardreportSchema } from '../schema/hazardreport';
+import { hazardreportValidator } from '../validators/hazardreport';
 import { IHazardReport } from '../interfaces/hazardreport';
 
 const NAMESPACE = 'HazardReport';
 
 const createHazardReport = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const { error, value } = hazardreportSchema.validate({
+        const { error, value } = hazardreportValidator.validate({
             ...req.body,
             images: (req.files as Express.Multer.File[] | undefined)?.map(file => file.filename) || []
         });
@@ -30,7 +30,7 @@ const createHazardReport = async (req: Request, res: Response, next: NextFunctio
         }
 
         // Create hazard report with explicit type
-        const hazardReport = await HazardReport.create(value) as IHazardReport & { _id: Types.ObjectId };
+        const hazardReport = await HazardReport.create({...value, user}) as IHazardReport & { _id: Types.ObjectId };
 
         // Add the new hazard report's ID to the user's reports array
         user.reports.push(hazardReport._id);
@@ -47,7 +47,7 @@ const createHazardReport = async (req: Request, res: Response, next: NextFunctio
 const getAllHazardReports = async (req: Request, res: Response, next: NextFunction) => {
     try {
         // If you're validating query parameters, use req.query instead of req.body
-        const { error, value } = hazardreportSchema.validate(req.query);  // Adjust validation for query parameters
+        const { error, value } = hazardreportValidator.validate(req.query);  // Adjust validation for query parameters
         if (error) {
             console.error('Validation Error:', error.details[0].message);
             return res.status(400).json({ message: error.details[0].message });
@@ -104,7 +104,7 @@ const updateHazardReport = async (req: Request, res: Response, next: NextFunctio
 
     try {
         // Validate the data to update a hazard report
-        const { error, value } = hazardreportSchema.validate(req.body);
+        const { error, value } = hazardreportValidator.validate(req.body);
         if (error) {
             console.error('Validation Error:', error.details[0].message);
             return res.status(400).json({ message: error.details[0].message });
@@ -130,6 +130,40 @@ const updateHazardReport = async (req: Request, res: Response, next: NextFunctio
         }
     } catch (error) {
         console.error('Error updating hazard report:', error);
+        next(error);
+    }
+};
+
+
+
+const getUserHazardCount = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const jwtId = res.locals.jwt?.id; // Extract user ID from the JWT
+
+        // Check if the user ID exists in the JWT
+        if (!jwtId) {
+            return res.status(401).json({ message: "Unauthorized: User ID is missing in JWT" });
+        }
+
+        // Validate that the user ID is a valid MongoDB ObjectId
+        if (!mongoose.isValidObjectId(jwtId)) {
+            return res.status(400).json({ message: "Invalid User ID format" });
+        }
+
+        // Convert the user ID to a MongoDB ObjectId
+        const userId = new mongoose.Types.ObjectId(jwtId);
+
+        // Fetch the hazard reports associated with the user
+        const hazardReports = await HazardReport.find({ user: userId }).exec();
+        console.log("Hazard Reports Retrieved:", hazardReports);
+
+        return res.status(200).json({
+            message: "User Hazard Reports retrieved successfully",
+            hazardReports,
+            count: hazardReports.length,
+        });
+    } catch (error) {
+        console.error("Error fetching user hazard reports:", error);
         next(error);
     }
 };
@@ -162,4 +196,4 @@ const deleteHazardReport = async (req: Request, res: Response, next: NextFunctio
     }
 };
 
-export default { createHazardReport, updateHazardReport, getHazardReportById, getAllHazardReports, deleteHazardReport };
+export default { createHazardReport, updateHazardReport, getHazardReportById, getAllHazardReports, getUserHazardCount, deleteHazardReport };

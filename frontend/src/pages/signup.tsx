@@ -2,7 +2,8 @@ import React, { useState } from "react";
 import { assets } from "../assets";
 import { Link, useNavigate } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
-import { apiSignup } from "./services/auth";
+import { apiSignup } from "../services/auth";
+import { AxiosError } from "axios";
 
 const SignUp: React.FC = () => {
   const [email, setEmail] = useState<string>("");
@@ -23,29 +24,23 @@ const SignUp: React.FC = () => {
     }
     try {
       setLoading(true);
-      const payload = {
+      await apiSignup({
         firstName: firstName,
         lastName: lastName,
         email: email,
         password: password,
         confirmPassword: confirmPassword,
-       userName: userName,
-      };
-      console.log("Payload:", payload);
-      const response = await apiSignup(payload);
-      console.log(response.data);
+        userName: userName,
+      });
       toast.success("Sign up Successful");
       navigate("/login");
     } catch (error) {
-      toast.error("Signup failed. Please try again.");
-
-      console.log(error);
+      const err = error as AxiosError;
+      toast.error(err.response?.data?.message ?? "An error occurred");
     } finally {
       setLoading(false);
     }
   };
-
-
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">

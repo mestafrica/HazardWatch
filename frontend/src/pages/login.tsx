@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import logImage from "../assets/images/log.png";
 import { Link, useNavigate } from "react-router-dom";
-import { apiLogin } from "./services/auth";
+import { apiLogin } from "../services/auth";
 import { toast, ToastContainer } from "react-toastify";
-import 'react-toastify/dist/ReactToastify.css';
-import { apiAdminLogi } from "../../../admin-dashboard/src/services/auth";
+import "react-toastify/dist/ReactToastify.css";
+import { ROUTES } from "../constants/routes";
 
 const Login: React.FC = () => {
   const [userName, setUserName] = useState<string>("");
@@ -13,7 +13,7 @@ const Login: React.FC = () => {
   const navigate = useNavigate();
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-   event.preventDefault()
+    event.preventDefault();
     const formData = new FormData(event.currentTarget);
     const userName = formData.get("userName") as string;
     const password = formData.get("password") as string;
@@ -21,16 +21,14 @@ const Login: React.FC = () => {
     try {
       const response = await apiLogin({ userName, password });
 
-    if (response.status === 200) {
-      localStorage.setItem("token", response.data.accessToken);
-      toast.success("Login Successful");
-      navigate("/dashboard");
-    } 
-  } catch (error) {
-    toast.error("Error logging in. Please check your credentials.");
-  }
-
-    navigate("/dashboard");
+      if (response.status === 200) {
+        localStorage.setItem("token", response.data.token);
+        toast.success("Login Successful");
+        navigate(`/${ROUTES.dashboard}`);
+      }
+    } catch (error) {
+      toast.error("Error logging in. Please check your credentials.");
+    }
   };
 
   return (
@@ -65,7 +63,7 @@ const Login: React.FC = () => {
                 required
               />
             </div>
-            
+
             <div>
               <label
                 htmlFor="password"

@@ -1,27 +1,27 @@
 
-import React from 'react';
-import Map from '../components/Map';
-import Navbar from '../components/Navbar';
-import Sidebar  from '../components/Sidebar';
+import { Outlet } from "react-router-dom";
+import Sidebar from "../components/Sidebar";
+import Navbar from "../components/Navbar";
 
-const MapPage: React.FC = () => {
+const FrontEndLayout: React.FC = () => {
   return (
     <div className="flex h-screen">
       <div>
         <Sidebar />
       </div>
 
+    
       <div className="flex-1 flex flex-col">
         <div>
           <Navbar />
         </div>
 
         <div className="flex-1 p-6 ">
-          <Map />
+          <Outlet />
         </div>
       </div>
     </div>
   );
 };
 
-export default MapPage;
+export default FrontEndLayout;
