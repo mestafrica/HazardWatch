@@ -46,18 +46,7 @@ const createHazardReport = async (req: Request, res: Response, next: NextFunctio
 
 const getAllHazardReports = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        // If you're validating query parameters, use req.query instead of req.body
-        const { error, value } = hazardreportValidator.validate(req.query);  // Adjust validation for query parameters
-        if (error) {
-            console.error('Validation Error:', error.details[0].message);
-            return res.status(400).json({ message: error.details[0].message });
-        }
-
-        // Assuming you might want to filter by title or other parameters
-        const filter = value.title ? { title: value.title } : {};
-        console.log('Validation successful. Fetching hazard reports with filter:', filter);
-
-        const hazardReports = await HazardReport.find(filter).exec();
+        const hazardReports = await HazardReport.find();
 
         return res.status(200).json({
             message: 'All Hazard Reports retrieved successfully',
