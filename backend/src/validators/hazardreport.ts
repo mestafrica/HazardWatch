@@ -4,7 +4,7 @@ export const hazardreportValidator = Joi.object({
     title: Joi.string().required(),
     hazardtype: Joi.string().required(),
     description: Joi.string().required(),
-    images: Joi.array().items(Joi.string()),
+    images: Joi.array().items(Joi.string()).sparse(false).default([]),
     longitude: Joi.string().required(),
     latitude: Joi.string().required(),
     city: Joi.string().required(),

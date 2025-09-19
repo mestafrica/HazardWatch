@@ -5,13 +5,19 @@ import User from '../models/user';
 import { hazardreportValidator } from '../validators/hazardreport';
 import { IHazardReport } from '../interfaces/hazardreport';
 
+
 const NAMESPACE = 'HazardReport';
 
 const createHazardReport = async (req: Request, res: Response, next: NextFunction) => {
     try {
+console.log('req.files:', req.files);
+        console.log('req.body before processing:', req.body)
+        
         const { error, value } = hazardreportValidator.validate({
             ...req.body,
-            images: (req.files as Express.Multer.File[] | undefined)?.map(file => file.filename) || []
+           images: (req.files as Express.Multer.File[] | undefined)
+  ?.filter(file => file && (file as any).filename && (file as any).path)
+  ?.map(file => (file as any).filename) || []
         });
 
         if (error) {
