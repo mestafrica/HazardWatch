@@ -32,12 +32,7 @@ router.get(
   hasPermission("view_reports"),
   hazardReportController.getHazardReportStats,
 );
-router.patch(
-  "/admin/reports/:id/status",
-  checkAuth,
-  hasPermission("update_report_status"),
-  hazardReportController.updateReportStatus,
-);
+
 
 // ─── Content Moderation Routes (protected) ────────────────────────────────────
 router.patch(

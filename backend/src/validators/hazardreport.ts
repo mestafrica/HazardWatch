@@ -8,5 +8,7 @@ export const hazardreportValidator = Joi.object({
   location: Joi.string().required(),
   city: Joi.string().required(),
   country: Joi.string().required(),
+  latitude: Joi.string().optional().allow(""),
+  longitude: Joi.string().optional().allow(""),
   user: Joi.string().optional(),
 });

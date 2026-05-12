@@ -4,7 +4,7 @@ import express from "express";
 const router = express.Router();
 
 router.get("/", async (req, res) => {
-  console.log("Air quality request received with query:", req.query);
+  // console.log("Air quality request received with query:", req.query);
   try {
     const { lat, lon } = req.query;
 
@@ -19,7 +19,7 @@ router.get("/", async (req, res) => {
     );
 
     const data = response.data;
-    console.log("Air quality data:", data);
+    // console.log("Air quality data:", data);
 
     res.status(200).json({
       aqi: data?.data?.aqi ?? null,
