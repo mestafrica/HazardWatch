@@ -1,12 +1,6 @@
-import { v2 as cloudinary } from "cloudinary";
 import { NextFunction, Request, Response } from "express";
 import multer from "multer";
-
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME as string,
-  api_key: process.env.CLOUDINARY_API_KEY as string,
-  api_secret: process.env.CLOUDINARY_API_SECRET as string,
-});
+import cloudinary from "../config/cloudinary";
 
 const storage = multer.memoryStorage();
 
@@ -28,11 +22,10 @@ const profileUpload = multer({
 const streamToCloudinary = (
   buffer: Buffer,
   folder: string,
-  resourceType: "image" | "auto" = "image",
 ): Promise<string> => {
   return new Promise((resolve, reject) => {
     const stream = cloudinary.uploader.upload_stream(
-      { folder, resource_type: resourceType },
+      { folder },
       (error, result) => {
         if (error || !result) return reject(error);
         resolve(result.secure_url);
@@ -46,29 +39,29 @@ export const uploadHazardFiles = [
   hazardUpload.array("files", 5),
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      if (!req.files || !Array.isArray(req.files)) return next();
+      if (!req.files?.length) return next();
 
-      const allowedTypes = [
+      const allowedTypes = new Set([
         "image/jpeg",
         "image/jpg",
         "image/png",
         "image/webp",
         "image/gif",
-      ];
+      ]);
 
-      req.body.uploadedUrls = await Promise.all(
-        req.files.map((file) => {
-          if (!allowedTypes.includes(file.mimetype)) {
-            throw new Error(
-              "Invalid file type. Allowed: images only (jpg, jpeg, png, gif).",
-            );
-          }
+      const files = req.files as Express.Multer.File[];
 
-          return streamToCloudinary(
-            file.buffer,
-            "hazardwatch/hazards/pictures",
-          );
-        }),
+      const invalid = files.find((f) => !allowedTypes.has(f.mimetype));
+      if (invalid) {
+        return res.status(400).json({
+          message: "Invalid file type. Allowed: jpg, jpeg, png, webp, gif.",
+        });
+      }
+
+      req.body.images = await Promise.all(
+        files.map((f) =>
+          streamToCloudinary(f.buffer, "hazardwatch/hazards/pictures"),
+        ),
       );
 
       next();
@@ -82,10 +75,12 @@ export const uploadAnnouncementFiles = [
   announcementUpload.array("files", 5),
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      if (!req.files || !Array.isArray(req.files)) return next();
+      if (!req.files?.length) return next();
 
-      req.body.uploadedUrls = await Promise.all(
-        req.files.map((file) => {
+      const files = req.files as Express.Multer.File[];
+
+      req.body.attachments = await Promise.all(
+        files.map((file) => {
           if (!file.mimetype.startsWith("image/")) {
             throw new Error("Only image files are allowed!");
           }
@@ -130,7 +125,7 @@ export const uploadProfilePicture = [
 ];
 
 export const multerErrorHandler = (
-  err: any,
+  err: Error,
   req: Request,
   res: Response,
   next: NextFunction,

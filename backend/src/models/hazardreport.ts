@@ -10,6 +10,8 @@ const hazardReportSchema: Schema = new Schema(
     location: { type: String, required: true },
     city: { type: String, required: true },
     country: { type: String, required: true },
+    latitude: { type: String, default: null },
+    longitude: { type: String, default: null },
     user: { type: Schema.Types.ObjectId, ref: "User", required: true },
     status: {
       type: String,

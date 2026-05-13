@@ -108,7 +108,6 @@ router.get("/user-reports", extractJWT, controller.getUserHazardCount);
 router.patch(
   "/update/:id",
   extractJWT,
-  checkAdmin,
   controller.updateHazardReport,
 );
 /**
@@ -158,6 +157,6 @@ router.delete(
 router.get("/getall", controller.getAllHazardReports);
 router.get("/getid/:id", controller.getHazardReportById);
 
-// router.patch('/upvote/:id', extractJWT, controller.upvoteHazardReport);
+router.patch("/upvote/:id", extractJWT, controller.upvoteHazardReport);
 
 export default router;
