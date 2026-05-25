@@ -1,44 +1,33 @@
 import { NextFunction, Request, Response } from "express";
 import mongoose, { Types } from "mongoose";
+import { IHazardReport } from "../interfaces/hazardreport";
 import HazardReport from "../models/hazardreport";
 import User from "../models/user";
 import { hazardreportValidator } from "../validators/hazardreport";
-import { IHazardReport } from "../interfaces/hazardreport";
 
 const NAMESPACE = "HazardReport";
 
-type RequestWithFiles = Request & {
-  files?: unknown;
-};
-
 const createHazardReport = async (
-  req: RequestWithFiles,
+  req: Request,
   res: Response,
   next: NextFunction,
 ) => {
   try {
-    const { error, value } = hazardreportValidator.validate({
-      ...req.body,
-      images:
-        (req.files as Express.Multer.File[] | undefined)
-          ?.filter((file) => file && (file as any).path)
-          ?.map((file) => (file as any).path) || [],
-    });
+    console.log("Received create hazard report request with body:", req.body);
+    const { error, value } = hazardreportValidator.validate(req.body);
 
-    if (error) {
+    if (error)
       return res.status(400).json({ message: error.details[0].message });
-    }
 
     const userId = req.user?.id;
 
-    if (!userId) {
-      return res.status(401).json({ message: "Unauthorized" });
-    }
+    if (!userId) return res.status(401).json({ message: "Unauthorized" });
 
     const user = await User.findById(userId);
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    console.log("Creating hazard report for user:", user.userName);
+    console.log("Request body:", value);
 
     const hazardReport = (await HazardReport.create({
       ...value,
@@ -232,6 +221,58 @@ const deleteHazardReport = async (
   }
 };
 
+const upvoteHazardReport = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
+  try {
+    const { id } = req.params;
+    const userId = req.user?.id;
+
+    const hazard = await HazardReport.findById(id);
+
+    if (!hazard) {
+      res.status(404).json({ message: "Hazard report not found" });
+      return;
+    }
+
+    const alreadyUpvoted = hazard.upvotedBy.some(
+      (upvoterId) => upvoterId.toString() === userId.toString(),
+    );
+
+    if (alreadyUpvoted) {
+      // Undo the upvote
+      hazard.upvotedBy = hazard.upvotedBy.filter(
+        (upvoterId) => upvoterId.toString() !== userId.toString(),
+      );
+      hazard.upvotes = Math.max(0, hazard.upvotes - 1);
+
+      await hazard.save();
+
+      res.status(200).json({
+        message: "Upvote removed",
+        upvotes: hazard.upvotes,
+        upvoted: false,
+      });
+      return;
+    }
+
+    // Add the upvote
+    hazard.upvotedBy.push(userId);
+    hazard.upvotes += 1;
+
+    await hazard.save();
+
+    res.status(200).json({
+      message: "Hazard report upvoted",
+      upvotes: hazard.upvotes,
+      upvoted: true,
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Internal server error", error });
+  }
+};
+
 const getHazardReportStats = async (
   req: Request,
   res: Response,
@@ -406,6 +447,7 @@ export default {
   getAllHazardReports,
   getUserHazardCount,
   deleteHazardReport,
+  upvoteHazardReport,
   getHazardReportStats,
   updateReportStatus,
   deleteReportByAdmin,

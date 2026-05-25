@@ -8,14 +8,14 @@ import swaggerUi from "swagger-ui-express";
 import config from "./config/config";
 import logging from "./config/logging";
 import { swaggerSpec } from "./config/swagger";
-import announcementRoutes from "./router/announcement";
+import { multerErrorHandler } from "./middlewares/upload";
 import adminRoutes from "./router/admin";
-import hazardReport from "./router/hazardreport";
 import airQualityRoutes from "./router/airquality";
-import hazardRoutes from "./router/hazardtypes";
+import announcementRoutes from "./router/announcement";
+import commentRoutes from "./router/comment";
+import hazardReport from "./router/hazardreport";
 import resetPasswordRoutes from "./router/resetpassword";
 import userRoutes from "./router/user";
-import commentRoutes from "./router/comment";
 dotenv.config();
 
 const NAMESPACE = "Server";
@@ -96,6 +96,9 @@ app.use("/comments", commentRoutes);
 app.use("/announcement", announcementRoutes);
 app.use("/air-quality", airQualityRoutes);
 
+// Multer error handling middleware
+app.use(multerErrorHandler);
+
 // Error handling for not found routes
 app.use((req, res) => {
   const error = new Error("Not found");
@@ -105,26 +108,30 @@ app.use((req, res) => {
 });
 
 // Listen for incoming requests
-const port = Number(config.server.port) || 1337;
+const PORT = Number(process.env.PORT) || Number(config.server.port) || 3000;
 
-const startServer = (currentPort: number) => {
-  const server = app.listen(currentPort, () => {
-    console.log(`App listening on port ${currentPort}`);
+if (process.env.NODE_ENV === "production") {
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
   });
+} else {
+  const startServer = (currentPort: number) => {
+    const server = app.listen(currentPort, () => {
+      console.log(`Server running on port ${currentPort}`);
+    });
 
-  server.on("error", (err: NodeJS.ErrnoException) => {
-    if (err.code === "EADDRINUSE") {
-      console.log(
-        `Port ${currentPort} is already in use. Trying port ${currentPort + 1}...`,
-      );
-      startServer(currentPort + 1);
-    } else {
-      console.error("Server error:", err);
-    }
-  });
-};
+    server.on("error", (err: NodeJS.ErrnoException) => {
+      if (err.code === "EADDRINUSE") {
+        console.log(`Port ${currentPort} in use, trying ${currentPort + 1}...`);
+        startServer(currentPort + 1);
+      } else {
+        console.error("Server error:", err);
+      }
+    });
+  };
 
-startServer(port);
+  startServer(PORT);
+}
 
 // Error handling middleware
 app.use((error: Error, req: Request, res: Response, next: NextFunction) => {

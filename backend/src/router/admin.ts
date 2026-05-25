@@ -1,16 +1,16 @@
 import express from "express";
 import adminController from "../controllers/admin";
-import hazardReportController from "../controllers/hazardreport";
-import { checkAuth, hasPermission } from "../middlewares/auth";
-import { extractJWT, checkAdmin } from "../middlewares/extractJWT";
 import {
   createAnnouncement,
+  deleteAnnouncement,
   getAllAnnouncements,
   getAnnouncementById,
   updateAnnouncement,
-  deleteAnnouncement,
 } from "../controllers/announcement";
-import { uploadAnnouncementFiles } from "../middlewares/cloudinaryUpload";
+import hazardReportController from "../controllers/hazardreport";
+import { checkAuth, hasPermission } from "../middlewares/auth";
+import { checkAdmin, extractJWT } from "../middlewares/extractJWT";
+import { uploadAnnouncementFiles } from "../middlewares/upload";
 
 const router = express.Router();
 
@@ -32,12 +32,7 @@ router.get(
   hasPermission("view_reports"),
   hazardReportController.getHazardReportStats,
 );
-router.patch(
-  "/admin/reports/:id/status",
-  checkAuth,
-  hasPermission("update_report_status"),
-  hazardReportController.updateReportStatus,
-);
+
 
 // ─── Content Moderation Routes (protected) ────────────────────────────────────
 router.patch(
@@ -58,7 +53,7 @@ router.post(
   "/admin/announcements",
   extractJWT,
   checkAdmin,
-  uploadAnnouncementFiles.array("attachments", 5),
+  uploadAnnouncementFiles,
   createAnnouncement,
 );
 router.get("/admin/announcements", getAllAnnouncements);
@@ -67,7 +62,7 @@ router.patch(
   "/admin/announcements/:id",
   extractJWT,
   checkAdmin,
-  uploadAnnouncementFiles.array("attachments", 5),
+  uploadAnnouncementFiles,
   updateAnnouncement,
 );
 router.delete(
